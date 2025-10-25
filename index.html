@@ -392,7 +392,6 @@
                         <th>Nama Pemain</th>
                         <th>Nomor Punggung</th>
                         <th>Kelas</th>
-                        <th>Posisi</th>
                     </tr>
                 </thead>
                 <tbody id="roster-body">
@@ -467,15 +466,15 @@
             
             // --- DATA BARU: DAFTAR PEMAIN ---
             Rosters: [
-                { "Team Name": "Kelas X Tim 1", "Player Name": "Budi Santoso", "Number": 10, "Class": "X-A", "Position": "Kapten" },
-                { "Team Name": "Kelas X Tim 1", "Player Name": "Ani Wijaya", "Number": 7, "Class": "X-B", "Position": "Penyerang" },
-                { "Team Name": "Kelas X Tim 1", "Player Name": "Joko Susilo", "Number": 1, "Class": "X-C", "Position": "Penjaga Gawang" },
+                { "Team Name": "Kelas X Tim 1", "Player Name": "Budi Santoso", "Number": 10, "Class": "X-A"},
+                { "Team Name": "Kelas X Tim 1", "Player Name": "Ani Wijaya", "Number": 7, "Class": "X-B"},
+                { "Team Name": "Kelas X Tim 1", "Player Name": "Joko Susilo", "Number": 1, "Class": "X-C"},
                 
-                { "Team Name": "Kelas XI Tim 2", "Player Name": "Citra Dewi", "Number": 5, "Class": "XI-IPA 1", "Position": "Pivot" },
-                { "Team Name": "Kelas XI Tim 2", "Player Name": "Faisal Reza", "Number": 12, "Class": "XI-IPS 3", "Position": "Center" },
+                { "Team Name": "Kelas XI Tim 2", "Player Name": "Citra Dewi", "Number": 5, "Class": "XI-IPA 1"},
+                { "Team Name": "Kelas XI Tim 2", "Player Name": "Faisal Reza", "Number": 12, "Class": "XI-IPS 3"},
                 
-                { "Team Name": "Kelas XII Tim 1", "Player Name": "Rima Adelia", "Number": 8, "Class": "XII-Bahasa", "Position": "Guard" },
-                { "Team Name": "Kelas XII Tim 1", "Player Name": "Gilang Pratama", "Number": 4, "Class": "XII-IPA 2", "Position": "Forward" }
+                { "Team Name": "Kelas XII Tim 1", "Player Name": "Rima Adelia", "Number": 8, "Class": "XII-Bahasa"},
+                { "Team Name": "Kelas XII Tim 1", "Player Name": "Gilang Pratama", "Number": 4, "Class": "XII-IPA 2"}
             ]
         };
 
@@ -835,7 +834,6 @@
                             <td>${player['Player Name']}</td>
                             <td>${player['Number'] || '-'}</td>
                             <td>${player['Class'] || '-'}</td>
-                            <td>${player['Position'] || '-'}</td>
                         </tr>
                     `;
                     rosterBody.innerHTML += tr;
@@ -932,3 +930,4 @@
 </body>
 
 </html>
+
