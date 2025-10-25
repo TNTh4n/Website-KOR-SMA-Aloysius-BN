@@ -279,9 +279,9 @@
                 <thead>
                     <tr>
                         <th>Team Name</th>
-                        <th>1st Place</th>
-                        <th>2nd Place</th>
-                        <th>3rd Place</th>
+                        <th>1st</th>
+                        <th>2nd</th>
+                        <th>3rd</th>
                         <th>4th Place</th>
                         <th>Total Points</th>
                     </tr>
@@ -319,7 +319,7 @@
                 <div class="bracket-round">
                     <h3>Finals</h3>
                     <div id="match-8" class="bracket-match"></div>
-                    <h3 style="margin-top: 40px;">3rd Place</h3>
+                    <h3 style="margin-top: 40px;">3rd</h3>
                     <div id="match-7" class="bracket-match"></div>
                 </div>
 
@@ -420,14 +420,14 @@
         
         const localData = {
             Teams: [
-                { "Team Name": "X Tim 1", "1st Place": 1, "2nd Place": 0, "3rd Place": 1, "4th Place": 0 },
-                { "Team Name": "X Tim 2", "1st Place": 0, "2nd Place": 2, "3rd Place": 0, "4th Place": 0 },
-                { "Team Name": "XI Tim 1", "1st Place": 0, "2nd Place": 0, "3rd Place": 1, "4th Place": 1 },
-                { "Team Name": "XI Tim 2", "1st Place": 2, "2nd Place": 1, "3rd Place": 0, "4th Place": 0 },
-                { "Team Name": "XI Tim 3", "1st Place": 0, "2nd Place": 0, "3rd Place": 0, "4th Place": 1 },
-                { "Team Name": "XII Tim 1", "1st Place": 1, "2nd Place": 0, "3rd Place": 0, "4th Place": 0 },
-                { "Team Name": "XII Tim 2", "1st Place": 0, "2nd Place": 0, "3rd Place": 1, "4th Place": 0 },
-                { "Team Name": "XII Tim 3", "1st Place": 0, "2nd Place": 1, "3rd Place": 0, "4th Place": 0 }
+                { "Team Name": "X Tim 1", "1st": 1, "2nd": 0, "3rd": 1, "4th Place": 0 },
+                { "Team Name": "X Tim 2", "1st": 0, "2nd": 2, "3rd": 0, "4th Place": 0 },
+                { "Team Name": "XI Tim 1", "1st": 0, "2nd": 0, "3rd": 1, "4th Place": 1 },
+                { "Team Name": "XI Tim 2", "1st": 2, "2nd": 1, "3rd": 0, "4th Place": 0 },
+                { "Team Name": "XI Tim 3", "1st": 0, "2nd": 0, "3rd": 0, "4th Place": 1 },
+                { "Team Name": "XII Tim 1", "1st": 1, "2nd": 0, "3rd": 0, "4th Place": 0 },
+                { "Team Name": "XII Tim 2", "1st": 0, "2nd": 0, "3rd": 1, "4th Place": 0 },
+                { "Team Name": "XII Tim 3", "1st": 0, "2nd": 1, "3rd": 0, "4th Place": 0 }
             ],
             
             Brackets: [
@@ -495,9 +495,9 @@
             
             if (data.length > 0) {
                 const sortedData = data.map(row => {
-                    const p1 = parseInt(row['1st Place'] || 0);
-                    const p2 = parseInt(row['2nd Place'] || 0);
-                    const p3 = parseInt(row['3rd Place'] || 0);
+                    const p1 = parseInt(row['1st'] || 0);
+                    const p2 = parseInt(row['2nd'] || 0);
+                    const p3 = parseInt(row['3rd'] || 0);
                     const p4 = parseInt(row['4th Place'] || 0);
                     const totalPoints = (p1 * 8) + (p2 * 6) + (p3 * 4) + (p4 * 2);
                     return { ...row, totalPoints, p1, p2, p3, p4 };
@@ -930,5 +930,6 @@
 </body>
 
 </html>
+
 
 
