@@ -342,8 +342,7 @@
                         <th>Sport</th>
                         <th>Team 1</th>
                         <th>Team 2</th>
-                        <th>Venue</th>
-                        <th>Status</th>
+                        <th>Tempat</th>
                     </tr>
                 </thead>
                 <tbody id="schedule-body-today">
@@ -360,8 +359,7 @@
                         <th>Sport</th>
                         <th>Team 1</th>
                         <th>Team 2</th>
-                        <th>Venue</th>
-                        <th>Status</th>
+                        <th>Tempat</th>
                     </tr>
                 </thead>
                 <tbody id="schedule-body-upcoming">
@@ -438,9 +436,9 @@
             ],
             
             Schedule: [
-                { "Date": "2025-10-25", "Time": "14:00:00", "Sport": "Basket putra", "Team 1": "X Tim 1", "Team 2": "XI Tim 2", "Venue": "GOR Utama", "Status": "finished" }, // Ganti status untuk hari ini
-                { "Date": "2025-10-25", "Time": "16:30:00", "Sport": "Voli putri", "Team 1": "X Tim 2", "Team 2": "XII Tim 3", "Venue": "Lapangan Voli A", "Status": "live" }, // Ganti status untuk hari ini
-                { "Date": "2025-10-26", "Time": "09:00:00", "Sport": "Sepak Bola", "Team 1": "XI Tim 1", "Team 2": "XII Tim 1", "Venue": "Stadion", "Status": "upcoming" }
+                { "Date": "2025-10-25", "Time": "14:00:00", "Sport": "Basket putra", "Team 1": "X Tim 1", "Team 2": "XI Tim 2", "Tempat": "GOR Utama"}, // Ganti status untuk hari ini
+                { "Date": "2025-10-25", "Time": "16:30:00", "Sport": "Voli putri", "Team 1": "X Tim 2", "Team 2": "XII Tim 3", "Tempat": "Lapangan Voli A"}, // Ganti status untuk hari ini
+                { "Date": "2025-10-26", "Time": "09:00:00", "Sport": "Sepak Bola", "Team 1": "XI Tim 1", "Team 2": "XII Tim 1", "Tempat": "Stadion"}
             ],
             
             Countdown: [
@@ -679,8 +677,7 @@
                         <td>${row['Sport']}</td>
                         <td>${row['Team 1']}</td>
                         <td>${row['Team 2']}</td>
-                        <td>${row['Venue']}</td>
-                        <td>${row['Status']}</td>
+                        <td>${row['Tempat']}</td>
                     </tr>
                 `;
                 
@@ -690,8 +687,7 @@
                         <td>${row['Sport']}</td>
                         <td>${row['Team 1']}</td>
                         <td>${row['Team 2']}</td>
-                        <td>${row['Venue']}</td>
-                        <td>${row['Status']}</td>
+                        <td>${row['Tempat']}</td>
                     </tr>
                 `;
 
@@ -930,6 +926,7 @@
 </body>
 
 </html>
+
 
 
 
