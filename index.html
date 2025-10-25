@@ -278,11 +278,11 @@
             <table id="leaderboard-table" style="display:none;">
                 <thead>
                     <tr>
-                        <th>Team Name</th>
+                        <th>Team</th>
                         <th>1st</th>
                         <th>2nd</th>
                         <th>3rd</th>
-                        <th>4th Place</th>
+                        <th>4th</th>
                         <th>Total Points</th>
                     </tr>
                 </thead>
@@ -420,14 +420,14 @@
         
         const localData = {
             Teams: [
-                { "Team Name": "X Tim 1", "1st": 1, "2nd": 0, "3rd": 1, "4th Place": 0 },
-                { "Team Name": "X Tim 2", "1st": 0, "2nd": 2, "3rd": 0, "4th Place": 0 },
-                { "Team Name": "XI Tim 1", "1st": 0, "2nd": 0, "3rd": 1, "4th Place": 1 },
-                { "Team Name": "XI Tim 2", "1st": 2, "2nd": 1, "3rd": 0, "4th Place": 0 },
-                { "Team Name": "XI Tim 3", "1st": 0, "2nd": 0, "3rd": 0, "4th Place": 1 },
-                { "Team Name": "XII Tim 1", "1st": 1, "2nd": 0, "3rd": 0, "4th Place": 0 },
-                { "Team Name": "XII Tim 2", "1st": 0, "2nd": 0, "3rd": 1, "4th Place": 0 },
-                { "Team Name": "XII Tim 3", "1st": 0, "2nd": 1, "3rd": 0, "4th Place": 0 }
+                { "Team": "X Tim 1", "1st": 1, "2nd": 0, "3rd": 1, "4th": 0 },
+                { "Team": "X Tim 2", "1st": 0, "2nd": 2, "3rd": 0, "4th": 0 },
+                { "Team": "XI Tim 1", "1st": 0, "2nd": 0, "3rd": 1, "4th": 1 },
+                { "Team": "XI Tim 2", "1st": 2, "2nd": 1, "3rd": 0, "4th": 0 },
+                { "Team": "XI Tim 3", "1st": 0, "2nd": 0, "3rd": 0, "4th": 1 },
+                { "Team": "XII Tim 1", "1st": 1, "2nd": 0, "3rd": 0, "4th": 0 },
+                { "Team": "XII Tim 2", "1st": 0, "2nd": 0, "3rd": 1, "4th": 0 },
+                { "Team": "XII Tim 3", "1st": 0, "2nd": 1, "3rd": 0, "4th": 0 }
             ],
             
             Brackets: [
@@ -466,15 +466,15 @@
             
             // --- DATA BARU: DAFTAR PEMAIN ---
             Rosters: [
-                { "Team Name": "X Tim 1", "Player Name": "Budi Santoso", "Number": 10, "Class": "X-A"},
-                { "Team Name": "X Tim 1", "Player Name": "Ani Wijaya", "Number": 7, "Class": "X-B"},
-                { "Team Name": "X Tim 1", "Player Name": "Joko Susilo", "Number": 1, "Class": "X-C"},
+                { "Team": "X Tim 1", "Player Name": "Budi Santoso", "Number": 10, "Class": "X-A"},
+                { "Team": "X Tim 1", "Player Name": "Ani Wijaya", "Number": 7, "Class": "X-B"},
+                { "Team": "X Tim 1", "Player Name": "Joko Susilo", "Number": 1, "Class": "X-C"},
                 
-                { "Team Name": "XI Tim 2", "Player Name": "Citra Dewi", "Number": 5, "Class": "XI-IPA 1"},
-                { "Team Name": "XI Tim 2", "Player Name": "Faisal Reza", "Number": 12, "Class": "XI-IPS 3"},
+                { "Team": "XI Tim 2", "Player Name": "Citra Dewi", "Number": 5, "Class": "XI-IPA 1"},
+                { "Team": "XI Tim 2", "Player Name": "Faisal Reza", "Number": 12, "Class": "XI-IPS 3"},
                 
-                { "Team Name": "XII Tim 1", "Player Name": "Rima Adelia", "Number": 8, "Class": "XII-Bahasa"},
-                { "Team Name": "XII Tim 1", "Player Name": "Gilang Pratama", "Number": 4, "Class": "XII-IPA 2"}
+                { "Team": "XII Tim 1", "Player Name": "Rima Adelia", "Number": 8, "Class": "XII-Bahasa"},
+                { "Team": "XII Tim 1", "Player Name": "Gilang Pratama", "Number": 4, "Class": "XII-IPA 2"}
             ]
         };
 
@@ -498,7 +498,7 @@
                     const p1 = parseInt(row['1st'] || 0);
                     const p2 = parseInt(row['2nd'] || 0);
                     const p3 = parseInt(row['3rd'] || 0);
-                    const p4 = parseInt(row['4th Place'] || 0);
+                    const p4 = parseInt(row['4th'] || 0);
                     const totalPoints = (p1 * 8) + (p2 * 6) + (p3 * 4) + (p4 * 2);
                     return { ...row, totalPoints, p1, p2, p3, p4 };
                 }).sort((a, b) => b.totalPoints - a.totalPoints);
@@ -507,7 +507,7 @@
                 sortedData.forEach(row => {
                     const tr = `
                         <tr>
-                            <td>${row['Team Name']}</td>
+                            <td>${row['Team']}</td>
                             <td>${row.p1}</td>
                             <td>${row.p2}</td>
                             <td>${row.p3}</td>
@@ -795,7 +795,7 @@
             if (teams.length > 0) {
                 teamSelect.innerHTML = '<option value="">-- Pilih Tim --</option>';
                 teams.forEach(team => {
-                    const teamName = team['Team Name'];
+                    const teamName = team['Team'];
                     teamSelect.innerHTML += `<option value="${teamName}">${teamName}</option>`;
                 });
             } else {
@@ -823,7 +823,7 @@
             }
             
             const allRosters = await getLocalData('Rosters');
-            const teamRoster = allRosters.filter(player => player['Team Name'] === teamName);
+            const teamRoster = allRosters.filter(player => player['Team'] === teamName);
             
             rosterBody.innerHTML = ''; 
             
@@ -930,6 +930,7 @@
 </body>
 
 </html>
+
 
 
 
