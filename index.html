@@ -417,7 +417,6 @@
                 <thead>
                     <tr>
                         <th>Nama Pemain</th>
-                        <th>Nomor Punggung</th>
                         <th>Kelas</th>
                         <th>Posisi</th>
                     </tr>
@@ -871,9 +870,7 @@
                     const tr = `
                         <tr>
                             <td>${player['Player Name'] || '-'}</td>
-                            <td>${player['Number'] || '-'}</td>
                             <td>${player['Class'] || '-'}</td>
-                            <td>${player['Position'] || '-'}</td>
                         </tr>
                     `;
                     rosterBody.innerHTML += tr;
@@ -974,6 +971,7 @@
     </script>
 </body>
 </html>
+
 
 
 
