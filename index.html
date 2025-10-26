@@ -35,7 +35,27 @@
             border-bottom: 2px solid var(--secondary-color);
             padding-bottom: 10px;
         }
-
+        /* Styling Keterangan Poin */
+        #point-explanation {
+            background-color: #2a2a4a; /* Warna latar belakang sedikit lebih gelap */
+            padding: 8px 12px; /* Dikecilkan sedikit */
+            margin-top: 15px; /* Tambahkan sedikit jarak dari tabel */
+            margin-bottom: 20px;
+            border-radius: 6px;
+            
+            /* MODIFIKASI: FONT-SIZE DIKECILKAN */
+            font-size: 0.85em; 
+            
+            color: #ffffff;
+            display: flex; 
+            flex-wrap: wrap;
+            gap: 10px; /* Jarak antar item poin dikecilkan */
+            justify-content: center;
+        }
+        
+        .point-item {
+            font-weight: bold;
+        }
         /* Navigation */
         nav {
             background-color: var(--card-color);
@@ -954,6 +974,7 @@
     </script>
 </body>
 </html>
+
 
 
 
