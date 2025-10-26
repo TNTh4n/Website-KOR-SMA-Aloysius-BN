@@ -2,10 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.7">
-    <title>KOR SMA BN 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olimpiade Sekolah</title>
     <style>
-        /* General Styling */
+        /* [Gaya CSS tidak diubah, tetap sama seperti sebelumnya] */
         :root {
             --bg-color: #1a1a2e;
             --card-color: #16213e;
@@ -255,20 +255,20 @@
             font-size: 1.2em;
             padding: 20px;
         }
-
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>KOR SMA ALOYSIUS BN 2025</h1>
+        <h1>Website Olimpiade Sekolah</h1>
 
         <nav>
             <a href="#leaderboard">Leaderboard</a>
             <a href="#bracket">Bracket</a>
             <a href="#schedule">Schedule</a>
             <a href="#countdown">Countdown</a>
-            <a href="#roster">Daftar Pemain</a> <a href="#sports">Sports</a>
+            <a href="#roster">Daftar Pemain</a> 
+            <a href="#sports">Sports</a>
             <a href="#gallery">Gallery</a>
         </nav>
 
@@ -278,12 +278,12 @@
             <table id="leaderboard-table" style="display:none;">
                 <thead>
                     <tr>
-                        <th>Team</th>
-                        <th>🥇</th>
-                        <th>🥈</th>
-                        <th>🥉</th>
-                        <th>🎖️</th>
-                        <th>Score</th>
+                        <th>Team Name</th>
+                        <th>1st Place</th>
+                        <th>2nd Place</th>
+                        <th>3rd Place</th>
+                        <th>4th Place</th>
+                        <th>Total Points</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
@@ -319,7 +319,7 @@
                 <div class="bracket-round">
                     <h3>Finals</h3>
                     <div id="match-8" class="bracket-match"></div>
-                    <h3 style="margin-top: 40px;">3rd</h3>
+                    <h3 style="margin-top: 40px;">3rd Place</h3>
                     <div id="match-7" class="bracket-match"></div>
                 </div>
 
@@ -342,7 +342,8 @@
                         <th>Sport</th>
                         <th>Team 1</th>
                         <th>Team 2</th>
-                        <th>Tempat</th>
+                        <th>Venue</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="schedule-body-today">
@@ -359,7 +360,8 @@
                         <th>Sport</th>
                         <th>Team 1</th>
                         <th>Team 2</th>
-                        <th>Tempat</th>
+                        <th>Venue</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="schedule-body-upcoming">
@@ -390,6 +392,7 @@
                         <th>Nama Pemain</th>
                         <th>Nomor Punggung</th>
                         <th>Kelas</th>
+                        <th>Posisi</th>
                     </tr>
                 </thead>
                 <tbody id="roster-body">
@@ -414,77 +417,67 @@
     </div>
 
     <script>
-        // --- DATA LOKAL (GANTI DI SINI UNTUK UPDATE) ---
+        // --- KONFIGURASI PENTING ---
+        // ID ini HARUS SESUAI dengan link spreadsheet Anda
+        const SHEET_ID = '1gAjNYTgbsGAMcVvk8-t7cD-ZrY7CFs4bNQowwnGY05Q';
+
+        // Variabel untuk menyimpan semua data dari Sheets agar tidak perlu fetch berulang
+        let cachedData = {};
+
+        // --- Fungsi Helper untuk Fetch Data dari Google Sheets ---
+        async function fetchSheetData(sheetName) {
+            // Cek cache, jika sudah ada, langsung kembalikan
+            if (cachedData[sheetName]) {
+                return cachedData[sheetName];
+            }
+
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Gagal mengambil data sheet. Cek izin berbagi.');
+                
+                let text = await response.text();
+                // Membersihkan JSONP wrapper dari Google
+                const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\);/s)[1];
+                const data = JSON.parse(jsonText);
+                
+                const parsedData = parseGvizData(data.table);
+                // Simpan ke cache
+                cachedData[sheetName] = parsedData; 
+                return parsedData;
+
+            } catch (error) {
+                console.error(`Error fetching ${sheetName}:`, error);
+                return [];
+            }
+        }
+
+        // Fungsi parsing data Gviz
+        function parseGvizData(table) {
+            if (!table || !table.rows || table.rows.length === 0) return [];
+            
+            // Menggunakan label kolom sebagai kunci objek
+            const headers = table.cols.map(col => col.label);
+            return table.rows.map(row => {
+                const item = {};
+                row.c.forEach((cell, index) => {
+                    // Ambil nilai 'v' (value) dari sel
+                    item[headers[index]] = cell ? cell.v : null; 
+                });
+                return item;
+            });
+        }
         
-        const localData = {
-            Teams: [
-                { "Team": "X Tim 1", "1st": 1, "2nd": 0, "3rd": 1, "4th": 0 },
-                { "Team": "X Tim 2", "1st": 0, "2nd": 2, "3rd": 0, "4th": 0 },
-                { "Team": "XI Tim 1", "1st": 0, "2nd": 0, "3rd": 1, "4th": 1 },
-                { "Team": "XI Tim 2", "1st": 2, "2nd": 1, "3rd": 0, "4th": 0 },
-                { "Team": "XI Tim 3", "1st": 0, "2nd": 0, "3rd": 0, "4th": 1 },
-                { "Team": "XII Tim 1", "1st": 1, "2nd": 0, "3rd": 0, "4th": 0 },
-                { "Team": "XII Tim 2", "1st": 0, "2nd": 0, "3rd": 1, "4th": 0 },
-                { "Team": "XII Tim 3", "1st": 0, "2nd": 1, "3rd": 0, "4th": 0 }
-            ],
-            
-            Brackets: [
-                { "Sport": "Basket putra", "Round": 1, "Match Number": 1, "Team 1": "XII Tim 2", "Team 2": "X Tim 2", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putra", "Round": 1, "Match Number": 2, "Team 1": "XI Tim 2", "Team 2": "XII Tim 1", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putra", "Round": 1, "Match Number": 3, "Team 1": "X Tim 1", "Team 2": "XI Tim 3", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putra", "Round": 1, "Match Number": 4, "Team 1": "XI Tim 1", "Team 2": "XII Tim 3", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putri", "Round": 1, "Match Number": 1, "Team 1": "XI Tim 1", "Team 2": "XII Tim 2", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putri", "Round": 1, "Match Number": 2, "Team 1": "XII Tim 3", "Team 2": "XI Tim 2", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putri", "Round": 1, "Match Number": 3, "Team 1": "X Tim 1", "Team 2": "X Tim 2", "Winner": "", "Score 1": 0, "Score 2": 0 },
-                { "Sport": "Basket putri", "Round": 1, "Match Number": 4, "Team 1": "XII Tim 1", "Team 2": "XI Tim 3", "Winner": "", "Score 1": 0, "Score 2": 0 },
-            ],
-            
-            Schedule: [
-                { "Date": "2025-10-25", "Time": "14:00:00", "Sport": "Basket putra", "Team 1": "X Tim 1", "Team 2": "XI Tim 2", "Tempat": "GOR Utama"}, // Ganti status untuk hari ini
-                { "Date": "2025-10-25", "Time": "16:30:00", "Sport": "Voli putri", "Team 1": "X Tim 2", "Team 2": "XII Tim 3", "Tempat": "Lapangan Voli A"}, // Ganti status untuk hari ini
-                { "Date": "2025-10-26", "Time": "09:00:00", "Sport": "Sepak Bola", "Team 1": "XI Tim 1", "Team 2": "XII Tim 1", "Tempat": "Stadion"}
-            ],
-            
-            Countdown: [
-                { "Event Name": "Upacara Pembukaan", "Target Date": "2025-10-28 08:00:00" },
-                { "Event Name": "Pengumuman Pemenang", "Target Date": "2025-11-16 17:00:00" }
-            ],
-            
-            Sports: [
-                { "Sport Name": "Basket putra", "Image URL": "https://via.placeholder.com/300x200?text=Basket+Putra", "Description": "Pertandingan 5 lawan 5...", "Rules": "Peraturan FIBA dimodifikasi.", "Number of Teams": 8, "Duration": "4x10 menit", "Winning Conditions": "Skor tertinggi." },
-                { "Sport Name": "Basket putri", "Image URL": "https://via.placeholder.com/300x200?text=Basket+Putri", "Description": "Pertandingan 5 lawan 5...", "Rules": "Peraturan FIBA dimodifikasi.", "Number of Teams": 6, "Duration": "4x8 menit", "Winning Conditions": "Skor tertinggi." },
-                { "Sport Name": "Voli putra", "Image URL": "https://via.placeholder.com/300x200?text=Voli+Putra", "Description": "Pertandingan bola voli standar.", "Rules": "3 set terbaik.", "Number of Teams": 8, "Duration": "Variabel", "Winning Conditions": "Mencapai 25 poin, selisih 2." },
-                { "Sport Name": "Voli putri", "Image URL": "https://via.placeholder.com/300x200?text=Voli+Putri", "Description": "Pertandingan bola voli standar.", "Rules": "3 set terbaik.", "Number of Teams": 6, "Duration": "Variabel", "Winning Conditions": "Mencapai 25 poin, selisih 2." },
-                { "Sport Name": "Polo air", "Image URL": "https://via.placeholder.com/300x200?text=Polo+Air", "Description": "Bermain di kolam renang.", "Rules": "Aturan dasar polo air.", "Number of Teams": 4, "Duration": "4x7 menit", "Winning Conditions": "Skor tertinggi." },
-                { "Sport Name": "Kasti", "Image URL": "https://via.placeholder.com/300x200?text=Kasti", "Description": "Permainan bola tradisional.", "Rules": "Aturan sekolah.", "Number of Teams": 8, "Duration": "2 babak", "Winning Conditions": "Jumlah run terbanyak." },
-                { "Sport Name": "Sepak Bola", "Image URL": "https://via.placeholder.com/300x200?text=Sepak+Bola", "Description": "Turnamen antar kelas.", "Rules": "Peraturan FIFA dimodifikasi (7 lawan 7).", "Number of Teams": 8, "Duration": "2x30 menit", "Winning Conditions": "Skor tertinggi." }
-            ],
-
-            Gallery: [
-                { "Image URL": "https://via.placeholder.com/250x200?text=Foto+Pembukaan", "Caption": "Upacara Pembukaan Meriah", "Date": "2025-11-10" },
-                { "Image URL": "https://via.placeholder.com/250x200?text=Aksi+Basket", "Caption": "Aksi Lincah di Lapangan Basket", "Date": "2025-11-12" },
-                { "Image URL": "https://via.placeholder.com/250x200?text=Juara+Voli", "Caption": "Tim Voli Putri Raih Gelar", "Date": "2025-11-15" }
-            ],
-            
-            // --- DATA BARU: DAFTAR PEMAIN ---
-            Rosters: [
-                { "Team": "X Tim 1", "Player Name": "Budi Santoso", "Number": 10, "Class": "X-A"},
-                { "Team": "X Tim 1", "Player Name": "Ani Wijaya", "Number": 7, "Class": "X-B"},
-                { "Team": "X Tim 1", "Player Name": "Joko Susilo", "Number": 1, "Class": "X-C"},
-                
-                { "Team": "XI Tim 2", "Player Name": "Citra Dewi", "Number": 5, "Class": "XI-IPA 1"},
-                { "Team": "XI Tim 2", "Player Name": "Faisal Reza", "Number": 12, "Class": "XI-IPS 3"},
-                
-                { "Team": "XII Tim 1", "Player Name": "Rima Adelia", "Number": 8, "Class": "XII-Bahasa"},
-                { "Team": "XII Tim 1", "Player Name": "Gilang Pratama", "Number": 4, "Class": "XII-IPA 2"}
-            ]
-        };
-
-        // --- FUNGSI UTAMA (Diadaptasi untuk menggunakan data lokal) ---
-
-        async function getLocalData(sheetName) {
-            await new Promise(resolve => setTimeout(resolve, 50));
-            return localData[sheetName] || [];
+        // Fungsi untuk menangani format tanggal yang aneh dari Gviz
+        function parseGvizDate(dateValue) {
+            // Asumsi format Gviz: "Date(YYYY,M,D,H,m,s)" (M adalah 0-indexed)
+            if (typeof dateValue === 'string' && dateValue.startsWith('Date(')) {
+                const parts = dateValue.substring(5, dateValue.length - 1).split(',');
+                // Parts: [tahun, bulan (0-indexed), hari, jam, menit, detik]
+                // Konstruksi Date object
+                return new Date(parts[0], parts[1], parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+            }
+            return null;
         }
 
         // --- 1. LEADERBOARD ---
@@ -493,23 +486,29 @@
             const table = document.getElementById('leaderboard-table');
             const tbody = document.getElementById('leaderboard-body');
             
-            const data = await getLocalData('Teams');
+            // Nama sheet harus "Teams"
+            const data = await fetchSheetData('Teams');
             
             if (data.length > 0) {
+                 // Sorting data berdasarkan Total Points (dari tertinggi ke terendah)
                 const sortedData = data.map(row => {
-                    const p1 = parseInt(row['1st'] || 0);
-                    const p2 = parseInt(row['2nd'] || 0);
-                    const p3 = parseInt(row['3rd'] || 0);
-                    const p4 = parseInt(row['4th'] || 0);
+                    // Konversi ke integer, jika null anggap 0
+                    const p1 = parseInt(row['1st Place'] || 0);
+                    const p2 = parseInt(row['2nd Place'] || 0);
+                    const p3 = parseInt(row['3rd Place'] || 0);
+                    const p4 = parseInt(row['4th Place'] || 0);
+                    
+                    // Kalkulasi Poin: 1st=8, 2nd=6, 3rd=4, 4th=2
                     const totalPoints = (p1 * 8) + (p2 * 6) + (p3 * 4) + (p4 * 2);
+                    
                     return { ...row, totalPoints, p1, p2, p3, p4 };
                 }).sort((a, b) => b.totalPoints - a.totalPoints);
-
+                
                 tbody.innerHTML = ''; 
                 sortedData.forEach(row => {
                     const tr = `
                         <tr>
-                            <td>${row['Team']}</td>
+                            <td>${row['Team Name'] || '-'}</td>
                             <td>${row.p1}</td>
                             <td>${row.p2}</td>
                             <td>${row.p3}</td>
@@ -523,18 +522,19 @@
                 loader.style.display = 'none';
                 table.style.display = 'table';
             } else {
-                loader.innerText = 'Tidak ada data Leaderboard.';
+                loader.innerText = 'Gagal memuat data Leaderboard atau data kosong. Cek sheet "Teams".';
             }
         }
 
-        // --- 2. BRACKET (Fungsi tidak berubah) ---
+        // --- 2. BRACKET ---
         let allSportsData = [];
         let allBracketsData = [];
 
         async function loadBracketData() {
             const sportSelect = document.getElementById('sport-select');
             
-            allSportsData = await getLocalData('Sports');
+            // 1. Fetch data olahraga untuk dropdown (Sheet: Sports)
+            allSportsData = await fetchSheetData('Sports');
             
             if (allSportsData.length > 0) {
                 sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
@@ -542,11 +542,13 @@
                     sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
                 });
             } else {
-                sportSelect.innerHTML = '<option value="">Tidak ada data olahraga</option>';
+                sportSelect.innerHTML = '<option value="">Gagal memuat daftar olahraga</option>';
             }
 
-            allBracketsData = await getLocalData('Brackets');
+            // 2. Fetch semua data bracket (Sheet: Brackets)
+            allBracketsData = await fetchSheetData('Brackets');
             
+            // 3. Tambah event listener ke dropdown
             sportSelect.addEventListener('change', (e) => {
                 renderBracket(e.target.value);
             });
@@ -563,6 +565,7 @@
                 return;
             }
 
+            // Filter data bracket berdasarkan nama olahraga
             const sportBrackets = allBracketsData.filter(match => match['Sport'] === sportName);
             
             if (sportBrackets.length === 0) {
@@ -583,11 +586,13 @@
             const matchWinnerEl = document.getElementById('match-winner');
             if (matchWinnerEl) matchWinnerEl.innerHTML = '';
 
+            // Map data ke match
             const matchMap = {};
             sportBrackets.forEach(match => {
                 matchMap[match['Match Number']] = match;
             });
             
+            // Fungsi helper untuk membuat HTML tim
             const createTeamHTML = (team, score, isWinner) => {
                 if (!team) return '<div class="bracket-team">&nbsp;</div>';
                 const winnerClass = isWinner ? 'winner' : '';
@@ -599,6 +604,7 @@
                 `;
             };
             
+            // Fungsi helper untuk mengisi match
             const fillMatch = (matchId, matchData) => {
                 const matchEl = document.getElementById(`match-${matchId}`);
                 if (!matchEl) return;
@@ -620,15 +626,17 @@
                 `;
             };
 
+            // Isi semua match (asumsi 8 pertandingan total)
             fillMatch(1, matchMap[1]);
             fillMatch(2, matchMap[2]);
             fillMatch(3, matchMap[3]);
             fillMatch(4, matchMap[4]);
-            fillMatch(5, matchMap[5]); 
-            fillMatch(6, matchMap[6]); 
-            fillMatch(7, matchMap[7]); 
-            fillMatch(8, matchMap[8]); 
+            fillMatch(5, matchMap[5]); // Semi
+            fillMatch(6, matchMap[6]); // Semi
+            fillMatch(7, matchMap[7]); // 3rd Place
+            fillMatch(8, matchMap[8]); // Final
             
+            // Isi Winner
             const finalMatch = matchMap[8];
             if (finalMatch && finalMatch['Winner']) {
                 document.getElementById('match-winner').innerHTML = createTeamHTML(finalMatch['Winner'], null, true);
@@ -638,7 +646,7 @@
         }
 
 
-        // --- 3. SCHEDULE (Fungsi tidak berubah, hanya data yang diubah) ---
+        // --- 3. SCHEDULE ---
         async function loadSchedule() {
             const loader = document.getElementById('schedule-loader');
             const todayTbody = document.getElementById('schedule-body-today');
@@ -648,10 +656,11 @@
             const noToday = document.getElementById('no-matches-today');
             const noUpcoming = document.getElementById('no-matches-upcoming');
 
-            const data = await getLocalData('Schedule');
+            // Nama sheet harus "Schedule"
+            const data = await fetchSheetData('Schedule');
             
             if (data.length === 0) {
-                loader.innerText = 'Tidak ada data Schedule.';
+                loader.innerText = 'Gagal memuat data Schedule atau data kosong. Cek sheet "Schedule".';
                 return;
             }
             
@@ -662,14 +671,10 @@
             let upcomingMatches = [];
 
             data.forEach(row => {
-                const matchDateStr = row['Date']; 
-                const matchTimeStr = row['Time']; 
+                // Gunakan fungsi helper untuk parsing tanggal dan waktu
+                const matchDateTime = parseGvizDate(row['Date']);
                 
-                if (!matchDateStr || !matchTimeStr) return;
-                
-                const matchDateTime = new Date(`${matchDateStr}T${matchTimeStr}`);
-
-                if (isNaN(matchDateTime)) return; 
+                if (!matchDateTime || isNaN(matchDateTime)) return; // Skip jika tanggal tidak valid
 
                 const displayDate = matchDateTime.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
                 const displayTime = matchDateTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -678,20 +683,22 @@
                     <tr>
                         <td>${displayDate}</td>
                         <td>${displayTime}</td>
-                        <td>${row['Sport']}</td>
-                        <td>${row['Team 1']}</td>
-                        <td>${row['Team 2']}</td>
-                        <td>${row['Tempat']}</td>
+                        <td>${row['Sport'] || '-'}</td>
+                        <td>${row['Team 1'] || '-'}</td>
+                        <td>${row['Team 2'] || '-'}</td>
+                        <td>${row['Venue'] || '-'}</td>
+                        <td>${row['Status'] || '-'}</td>
                     </tr>
                 `;
                 
                 const trToday = `
                     <tr>
                         <td>${displayTime}</td>
-                        <td>${row['Sport']}</td>
-                        <td>${row['Team 1']}</td>
-                        <td>${row['Team 2']}</td>
-                        <td>${row['Tempat']}</td>
+                        <td>${row['Sport'] || '-'}</td>
+                        <td>${row['Team 1'] || '-'}</td>
+                        <td>${row['Team 2'] || '-'}</td>
+                        <td>${row['Venue'] || '-'}</td>
+                        <td>${row['Status'] || '-'}</td>
                     </tr>
                 `;
 
@@ -723,16 +730,17 @@
             }
         }
 
-        // --- 4. COUNTDOWN (Fungsi tidak berubah, hanya data yang diubah) ---
+        // --- 4. COUNTDOWN ---
         let countdownIntervals = [];
         async function loadCountdown() {
             const loader = document.getElementById('countdown-loader');
             const container = document.getElementById('countdown-container');
             
-            const data = await getLocalData('Countdown');
+            // Nama sheet harus "Countdown"
+            const data = await fetchSheetData('Countdown');
             
             if (data.length === 0) {
-                loader.innerText = 'Tidak ada data Countdown.';
+                loader.innerText = 'Gagal memuat data Countdown atau data kosong. Cek sheet "Countdown".';
                 return;
             }
 
@@ -743,13 +751,14 @@
 
             data.forEach(row => {
                 const eventName = row['Event Name'];
-                const targetDateStr = row['Target Date']; 
+                const dateValue = row['Target Date (YYYY-MM-DD HH:mm:ss)']; 
                 
-                if (!targetDateStr) return;
+                if (!dateValue) return;
                 
-                const targetDate = new Date(targetDateStr.replace(' ', 'T'));
+                // Gunakan fungsi helper untuk parsing tanggal
+                const targetDate = parseGvizDate(dateValue);
 
-                if (isNaN(targetDate)) return;
+                if (isNaN(targetDate) || !targetDate) return;
 
                 const item = document.createElement('div');
                 item.className = 'countdown-item';
@@ -768,7 +777,7 @@
                     const distance = targetDate - now;
 
                     if (distance < 0) {
-                        timerEl.innerHTML = "EVENT SELESAI / SEDANG BERLANGSUNG";
+                        timerEl.innerHTML = "EVENT BERLANGSUNG";
                         clearInterval(interval);
                         return;
                     }
@@ -789,14 +798,17 @@
             const teamSelect = document.getElementById('team-select');
             const teamLoader = document.getElementById('roster-loader');
             
-            // 1. Ambil data tim untuk dropdown
-            const teams = await getLocalData('Teams');
+            // 1. Ambil data tim untuk dropdown (Sheet: Teams)
+            const teams = await fetchSheetData('Teams');
             
             if (teams.length > 0) {
                 teamSelect.innerHTML = '<option value="">-- Pilih Tim --</option>';
+                // Gunakan nama tim dari sheet Teams
                 teams.forEach(team => {
-                    const teamName = team['Team'];
-                    teamSelect.innerHTML += `<option value="${teamName}">${teamName}</option>`;
+                    const teamName = team['Team Name'];
+                    if (teamName) {
+                        teamSelect.innerHTML += `<option value="${teamName}">${teamName}</option>`;
+                    }
                 });
             } else {
                 teamSelect.innerHTML = '<option value="">Tidak ada data tim</option>';
@@ -822,8 +834,9 @@
                 return;
             }
             
-            const allRosters = await getLocalData('Rosters');
-            const teamRoster = allRosters.filter(player => player['Team'] === teamName);
+            // Nama sheet harus "Rosters"
+            const allRosters = await fetchSheetData('Rosters');
+            const teamRoster = allRosters.filter(player => player['Team Name'] === teamName);
             
             rosterBody.innerHTML = ''; 
             
@@ -831,9 +844,10 @@
                 teamRoster.forEach(player => {
                     const tr = `
                         <tr>
-                            <td>${player['Player Name']}</td>
+                            <td>${player['Player Name'] || '-'}</td>
                             <td>${player['Number'] || '-'}</td>
                             <td>${player['Class'] || '-'}</td>
+                            <td>${player['Position'] || '-'}</td>
                         </tr>
                     `;
                     rosterBody.innerHTML += tr;
@@ -844,16 +858,17 @@
             } else {
                 rosterTable.style.display = 'none';
                 teamLoader.style.display = 'block';
-                teamLoader.innerText = `Tidak ada daftar pemain terdaftar untuk ${teamName}.`;
+                teamLoader.innerText = `Tidak ada daftar pemain terdaftar untuk ${teamName}. Cek sheet "Rosters".`;
             }
         }
 
-        // --- 6. SPORTS INFO (Fungsi tidak berubah) ---
+        // --- 6. SPORTS INFO ---
         async function loadSportsInfo() {
             const loader = document.getElementById('sports-loader');
             const container = document.getElementById('sports-container');
             
-            const data = await getLocalData('Sports');
+            // Nama sheet harus "Sports"
+            const data = await fetchSheetData('Sports');
 
             if (data.length > 0) {
                 loader.style.display = 'none';
@@ -863,7 +878,7 @@
                         <div class="sport-card">
                             <img src="${sport['Image URL'] || 'https://via.placeholder.com/300x200?text=Sport'}" alt="${sport['Sport Name']}">
                             <div class="sport-card-content">
-                                <h3>${sport['Sport Name']}</h3>
+                                <h3>${sport['Sport Name'] || '-'}</h3>
                                 <p><strong>Deskripsi:</strong> ${sport['Description'] || '-'}</p>
                                 <p><strong>Aturan:</strong> ${sport['Rules'] || '-'}</p>
                                 <p><strong>Tim:</strong> ${sport['Number of Teams'] || '-'} | <strong>Durasi:</strong> ${sport['Duration'] || '-'}</p>
@@ -874,22 +889,26 @@
                     container.innerHTML += card;
                 });
             } else {
-                loader.innerText = 'Tidak ada data Sports.';
+                loader.innerText = 'Gagal memuat data Sports atau data kosong. Cek sheet "Sports".';
             }
         }
 
-        // --- 7. GALLERY (Fungsi tidak berubah) ---
+        // --- 7. GALLERY ---
         async function loadGallery() {
             const loader = document.getElementById('gallery-loader');
             const container = document.getElementById('gallery-container');
             
-            const data = await getLocalData('Gallery');
+            // Nama sheet harus "Gallery"
+            const data = await fetchSheetData('Gallery');
             
             if (data.length > 0) {
                 loader.style.display = 'none';
                 container.innerHTML = '';
                 data.forEach(item => {
-                    const date = item['Date'] ? new Date(item['Date']).toLocaleDateString('id-ID') : '';
+                    // Coba parsing tanggal dari Gviz, lalu format
+                    const dateObj = parseGvizDate(item['Date']);
+                    const date = dateObj ? dateObj.toLocaleDateString('id-ID') : '';
+
                     const galleryItem = `
                         <figure class="gallery-item">
                             <img src="${item['Image URL'] || 'https://via.placeholder.com/250x200?text=Image'}" alt="${item['Caption']}">
@@ -902,7 +921,7 @@
                     container.innerHTML += galleryItem;
                 });
             } else {
-                loader.innerText = 'Tidak ada data Gallery.';
+                loader.innerText = 'Gagal memuat data Gallery atau data kosong. Cek sheet "Gallery".';
             }
         }
 
@@ -912,7 +931,7 @@
             loadBracketData();
             loadSchedule();
             loadCountdown();
-            loadRoster(); // Panggil fungsi baru
+            loadRoster(); 
             loadSportsInfo();
             loadGallery();
             
@@ -928,14 +947,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
