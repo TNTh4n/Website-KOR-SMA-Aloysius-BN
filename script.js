@@ -458,7 +458,7 @@ async function loadSportsInfo() {
                     <div class="sport-card-content">
                         <h3>${sport['Sport Name'] || '-'}</h3>
                         <p><strong>Deskripsi:</strong> ${sport['Description'] || '-'}</p>
-                        <p><strong>Aturan:</strong> ${sport['Rules'] || '-'}</p>
+                        <p><strong>Aturan:</strong> <a href="${sport['Rules']}">Juknis</a></p>
                         <p><strong>Tim:</strong> ${sport['Number of Teams'] || '-'} | <strong>Durasi:</strong> ${sport['Duration'] || '-'}</p>
                         <p><strong>Kondisi Menang:</strong> ${sport['Winning Conditions'] || '-'}</p>
                     </div>
