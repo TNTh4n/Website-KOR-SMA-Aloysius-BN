@@ -1,1 +1,285 @@
+@import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+:root {
+    /* --bg-color: #054ad0; */
+    --card-color: #1d2e80; /*16213e*/
+    --font-color: #e0e0e0;
+    --header-color: #ffffff;
+    --primary-color: #0f3460; /*origin: 0f3460*/
+    --secondary-color: #ffde59; /*origin: e94560*/
+    --border-color: #535353;
+}
 
+.header {
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* background-color: var(--bg-color); */
+    color: var(--font-color);
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(to bottom right, #1941b9, #5a4dc9);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: scroll;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: var(--header-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 10px;
+}
+/* Styling Keterangan Poin */
+#point-explanation {
+    background-color: #2a2a4a; /* Warna latar belakang sedikit lebih gelap */
+    padding: 8px 12px; /* Dikecilkan sedikit */
+    margin-top: 15px; /* Tambahkan sedikit jarak dari tabel */
+    margin-bottom: 20px;
+    border-radius: 6px;
+    
+    /* MODIFIKASI: FONT-SIZE DIKECILKAN */
+    font-size: 0.85em; 
+    
+    color: #ffffff;
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 10px; /* Jarak antar item poin dikecilkan */
+    justify-content: center;
+}
+
+.point-item {
+    font-weight: bold;
+}
+/* Navigation */
+nav {
+    background-color: var(--card-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: sticky;
+    top:0;
+    z-index: 1;
+}
+
+nav a {
+    color: var(--header-color);
+    text-decoration: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: var(--primary-color);
+}
+
+/* Section Styling */
+.section {
+    background-color: var(--card-color);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #16213e;
+    color: var(--header-color);
+}
+
+tr:nth-child(even) {
+    background-color: #2e2e9b;
+}
+
+tr:hover {
+    background-color: var(--primary-color);
+}
+
+/* Countdown */
+#countdown-container {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+.countdown-item {
+    background-color: var(--bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px;
+    width: 200px;
+}
+
+.countdown-item h3 {
+    margin: 0 0 10px 0;
+    color: var(--secondary-color);
+}
+
+.countdown-timer {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Sports Info */
+#sports-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.sport-card {
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.sport-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.sport-card-content {
+    padding: 15px;
+    background-color: #2a2a4a;
+}
+
+.sport-card-content h3 {
+    margin-top: 0;
+    color: var(--secondary-color);
+}
+
+/* Gallery */
+#gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.gallery-item {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.gallery-item figcaption {
+    padding: 10px;
+    background-color: var(--bg-color);
+    font-style: italic;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* Bracket */
+.bracket-controls, .roster-controls {
+    margin-bottom: 20px;
+}
+
+.bracket-controls label, .roster-controls label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    background-color: #2a2a4a;
+    color: #fff;
+    font-size: 1em;
+    border: none;
+}
+
+.bracket-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+}
+
+.bracket-round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    min-width: 200px;
+    margin-right: 40px;
+}
+
+.bracket-round h3 {
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+.bracket-match {
+    background-color: var(--card-color);
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.bracket-team {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.team-name {
+    font-weight: normal;
+}
+
+.winner .team-name {
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.team-score {
+    font-weight: bold;
+}
+
+.bracket-team:first-child {
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Loading Spinner */
+.loader {
+    text-align: center;
+    font-size: 1.2em;
+    padding: 20px;
+}
