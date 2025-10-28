@@ -123,16 +123,26 @@ tr:hover {
 
 /* Styling untuk Tabel Responsif */
 .table-responsive {
-    overflow-x: auto; /* Ini yang membuat scrollbar muncul */
-    -webkit-overflow-scrolling: touch; /* Meningkatkan scrolling di iOS */
-    margin-top: 15px; /* Menjaga jarak dari elemen atas */
+    /* Ganti 'auto' menjadi 'hidden' (atau biarkan default) */
+    /* Untuk memaksa tabel mengecil tanpa scrollbar, kita tidak perlu ini, tapi kita pastikan minimal widthnya tidak terlalu besar */
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch; 
+    margin-top: 15px; 
 }
 
-/* Memastikan tabel di dalamnya tidak dikecilkan dan mempertahankan lebar penuhnya */
+/* Memastikan tabel di dalamnya tidak dipaksa memiliki lebar minimum yang besar */
 .table-responsive table {
-    min-width: 600px; /* Lebar minimum untuk tabel (misalnya, Leaderboard) */
+    /* Hapus min-width: 600px; */
     width: 100%; 
-    margin-top: 0; /* Mengatur ulang margin yang sudah dipindahkan ke .table-responsive */
+    margin-top: 0; 
+}
+
+/* Mengurangi padding dan menambahkan word-break agar teks bisa memotong jika terlalu panjang */
+th, td {
+    padding: 8px 10px; /* Padding compact yang sudah disarankan */
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    word-break: break-word; /* Memungkinkan teks panjang di dalam sel memotong baris */
 }
 
 /* Countdown */
@@ -353,32 +363,34 @@ select {
 
 /* --- Penyesuaian Lebar Kolom (Untuk Membuat Tabel Leaderboard Lebih Compact) --- */
 
-/* Kolom untuk Medali (Kolom ke-2, ke-3, ke-4, ke-5) */
-#leaderboard-table th:nth-child(2),
-#leaderboard-table td:nth-child(2),
-#leaderboard-table th:nth-child(3),
-#leaderboard-table td:nth-child(3),
-#leaderboard-table th:nth-child(4),
-#leaderboard-table td:nth-child(4),
-#leaderboard-table th:nth-child(5),
-#leaderboard-table td:nth-child(5) {
-    width: 15px; /* Menetapkan lebar yang sangat sempit */
-    text-align: center; /* Memastikan ikon di tengah kolom */
-    min-width: 15px; /* Mencegah kolom ini terlalu kecil */
-}
+/* --- OPTIMASI KHUSUS MOBILE (Layar Max 600px) --- */
+@media (max-width: 600px) {
+    /* 1. Mereduksi font-size & padding secara agresif */
+    .table-responsive th, 
+    .table-responsive td {
+        padding: 4px 3px; /* Padding super kecil */
+        font-size: 0.7em; /* Font sangat kecil */
+        white-space: normal;
+    }
 
-/* Kolom Skor (Kolom ke-6) */
-#leaderboard-table th:nth-child(6),
-#leaderboard-table td:nth-child(6) {
-    width: 40px; /* Sedikit lebih lebar untuk angka skor */
-    text-align: right; /* Skor biasanya diratakan kanan */
-    max-width: 40px; 
-}
+    /* 2. Memaksa Kolom Medali (Leaderboard) menjadi sangat sempit */
+    #leaderboard-table th:nth-child(2),
+    #leaderboard-table td:nth-child(2),
+    #leaderboard-table th:nth-child(3),
+    #leaderboard-table td:nth-child(3),
+    #leaderboard-table th:nth-child(4),
+    #leaderboard-table td:nth-child(4),
+    #leaderboard-table th:nth-child(5),
+    #leaderboard-table td:nth-child(5) {
+        width: 25px; 
+        min-width: 25px;
+    }
 
-/* Kolom Nama Tim (Kolom ke-1) akan secara otomatis mengambil semua sisa lebar yang tersedia */
-#leaderboard-table th:nth-child(1),
-#leaderboard-table td:nth-child(1) {
-    width: 70px; /* Sedikit lebih lebar untuk angka skor */
-    text-align: left; /* Skor biasanya diratakan kanan */
-    min-width: 70px; ; 
+    /* 3. Memaksa Kolom Skor (Leaderboard) menjadi sempit */
+    #leaderboard-table th:nth-child(6),
+    #leaderboard-table td:nth-child(6) {
+        width: 45px; 
+        min-width: 45px;
+        text-align: center;
+    }
 }
