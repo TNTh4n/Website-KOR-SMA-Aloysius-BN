@@ -336,3 +336,36 @@ select {
 .rank-1 { color: #FFD700; font-weight: bold; } 
 .rank-2 { color: #C0C0C0; font-weight: bold; } 
 .rank-3 { color: #CD7F32; font-weight: bold; }
+
+/* Peringkat 1 (Gold/Kuning) */
+.rank-1-row {
+    font-weight: bold;
+    color: #FFD700; /* Warna emas terang */
+    background-color: #4a3e1c !important; /* Background emas gelap. Penggunaan !important agar tidak ditimpa warna genap/ganjil. */
+}
+/* Memperbaiki hover untuk Peringkat 1 */
+.rank-1-row:hover {
+    background-color: #594d2e !important; 
+}
+
+/* Peringkat 2 (Silver/Perak) */
+.rank-2-row {
+    font-weight: bold;
+    color: #C0C0C0; /* Warna perak */
+    background-color: #313131 !important; /* Background perak gelap */
+}
+/* Memperbaiki hover untuk Peringkat 2 */
+.rank-2-row:hover {
+    background-color: #414141 !important;
+}
+
+/* Peringkat 3 (Bronze/Perunggu) */
+.rank-3-row {
+    font-weight: bold;
+    color: #CD7F32; /* Warna perunggu */
+    background-color: #332d21 !important; /* Background perunggu gelap */
+}
+/* Memperbaiki hover untuk Peringkat 3 */
+.rank-3-row:hover {
+    background-color: #433d31 !important;
+}
