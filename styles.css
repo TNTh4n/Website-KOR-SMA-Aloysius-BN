@@ -103,7 +103,7 @@ table {
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 12px 15px; /* DIKEMBALIKAN KE NILAI ASLI */
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
@@ -119,30 +119,6 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: #5468cc;
-}
-
-/* Styling untuk Tabel Responsif */
-.table-responsive {
-    /* Ganti 'auto' menjadi 'hidden' (atau biarkan default) */
-    /* Untuk memaksa tabel mengecil tanpa scrollbar, kita tidak perlu ini, tapi kita pastikan minimal widthnya tidak terlalu besar */
-    overflow-x: hidden; 
-    -webkit-overflow-scrolling: touch; 
-    margin-top: 15px; 
-}
-
-/* Memastikan tabel di dalamnya tidak dipaksa memiliki lebar minimum yang besar */
-.table-responsive table {
-    /* Hapus min-width: 600px; */
-    width: 100%; 
-    margin-top: 0; 
-}
-
-/* Mengurangi padding dan menambahkan word-break agar teks bisa memotong jika terlalu panjang */
-th, td {
-    padding: 8px 10px; /* Padding compact yang sudah disarankan */
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    word-break: break-word; /* Memungkinkan teks panjang di dalam sel memotong baris */
 }
 
 /* Countdown */
@@ -316,60 +292,4 @@ select {
 
 .race-round-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.race-round-container.final {
-    grid-template-columns: 1fr; 
-}
-
-.race-round {
-    background-color: var(--bg-color); 
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.race-round h3 {
-    text-align: center;
-    color: var(--secondary-color);
-    margin-top: 0;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-}
-
-.race-round table {
-    margin-top: 0;
-}
-
-.race-round th {
-    text-align: left;
-}
-
-.race-round td {
-    padding: 10px 12px;
-}
-
-.race-winner td {
-    font-weight: bold;
-    color: var(--secondary-color);
-    background-color: #2e2e9b; 
-}
-
-.rank-1 { color: #FFD700; font-weight: bold; } 
-.rank-2 { color: #C0C0C0; font-weight: bold; } 
-.rank-3 { color: #CD7F32; font-weight: bold; }
-
-/* --- Penyesuaian Lebar Kolom (Untuk Membuat Tabel Leaderboard Lebih Compact) --- */
-
-/* --- OPTIMASI KHUSUS MOBILE (Layar Max 600px) --- */
-@media (max-width: 600px) {
-    /* 1. Mereduksi font-size & padding secara agresif */
-    .table-responsive th, 
-    .table-responsive td {
-        padding: 4px 3px; /* Padding super kecil */
-        font-size: 0.7em; /* Font sangat kecil */
-        white-space: normal;
-    }
-}
+    grid-template-columns:
