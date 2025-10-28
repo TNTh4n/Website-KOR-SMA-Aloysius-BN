@@ -362,9 +362,9 @@ select {
 #leaderboard-table td:nth-child(4),
 #leaderboard-table th:nth-child(5),
 #leaderboard-table td:nth-child(5) {
-    width: 45px; /* Menetapkan lebar yang sangat sempit */
+    width: 15px; /* Menetapkan lebar yang sangat sempit */
     text-align: center; /* Memastikan ikon di tengah kolom */
-    min-width: 45px; /* Mencegah kolom ini terlalu kecil */
+    min-width: 15px; /* Mencegah kolom ini terlalu kecil */
 }
 
 /* Kolom Skor (Kolom ke-6) */
