@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.7">
     <title>KOR 2025</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
     <link rel="icon" type="image/x-icon" href="https://github.com/TNTh4n/Website-KOR-SMA-Aloysius-BN/blob/main/Logo%20Aloy/logoaloy.ico?raw=true">
-
 </head>
 <body>
     <div class="container">
@@ -38,7 +36,7 @@
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
-                    </tbody>
+                </tbody>
             </table>
             
             <div id="point-explanation">
@@ -58,9 +56,10 @@
                     <option value="">Memuat...</option>
                 </select>
             </div>
+            
             <div id="bracket-loader" class="loader">Pilih olahraga untuk melihat bracket.</div>
+
             <div id="bracket-main" class="bracket-container" style="display:none;">
-                
                 <div class="bracket-round">
                     <h3>Round 1</h3>
                     <div id="match-1" class="bracket-match"></div>
@@ -68,27 +67,49 @@
                     <div id="match-3" class="bracket-match"></div>
                     <div id="match-4" class="bracket-match"></div>
                 </div>
-
                 <div class="bracket-round">
                     <h3>Semi-Finals</h3>
                     <div id="match-5" class="bracket-match"></div>
                     <div id="match-6" class="bracket-match"></div>
                 </div>
-
                 <div class="bracket-round">
                     <h3>Finals</h3>
                     <div id="match-8" class="bracket-match"></div>
                     <h3 style="margin-top: 40px;">3rd Place</h3>
                     <div id="match-7" class="bracket-match"></div>
                 </div>
-
                 <div class="bracket-round">
                     <h3>Winner</h3>
                     <div id="match-winner" class="bracket-match"></div>
                 </div>
             </div>
-        </div>
 
+            <div id="bracket-race" class="race-container" style="display:none;">
+                <h2>Round 1: Kualifikasi Angkatan</h2>
+                <div class="race-round-container">
+                    <div class="race-round">
+                        <h3>Kelas X</h3>
+                        <table id="race-round-X"></table>
+                    </div>
+                    <div class="race-round">
+                        <h3>Kelas XI</h3>
+                        <table id="race-round-XI"></table>
+                    </div>
+                    <div class="race-round">
+                        <h3>Kelas XII</h3>
+                        <table id="race-round-XII"></table>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 30px;">Round 2: Final</h2>
+                <div class="race-round-container final">
+                    <div class="race-round">
+                        <h3>Hasil Akhir (Berdasarkan Waktu)</h3>
+                        <table id="race-round-Final"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="schedule" class="section">
             <h2>Schedule</h2>
             <div id="schedule-loader" class="loader">Loading...</div>
@@ -106,7 +127,7 @@
                     </tr>
                 </thead>
                 <tbody id="schedule-body-today">
-                    </tbody>
+                </tbody>
             </table>
             <p id="no-matches-today" style="display:none;">Tidak ada pertandingan hari ini.</p>
 
@@ -123,7 +144,7 @@
                     </tr>
                 </thead>
                 <tbody id="schedule-body-upcoming">
-                    </tbody>
+                </tbody>
             </table>
             <p id="no-matches-upcoming" style="display:none;">Tidak ada pertandingan yang akan datang.</p>
         </div>
@@ -132,7 +153,7 @@
             <h2>Countdown</h2>
             <div id="countdown-loader" class="loader">Loading...</div>
             <div id="countdown-container">
-                </div>
+            </div>
         </div>
         
         <div id="roster" class="section">
@@ -152,7 +173,7 @@
                     </tr>
                 </thead>
                 <tbody id="roster-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
 
@@ -160,19 +181,18 @@
             <h2>Sports Information</h2>
             <div id="sports-loader" class="loader">Loading...</div>
             <div id="sports-container">
-                </div>
+            </div>
         </div>
 
         <div id="gallery" class="section">
             <h2>Gallery</h2>
             <div id="gallery-loader" class="loader">Loading...</div>
             <div id="gallery-container">
-                </div>
+            </div>
         </div>
 
     </div>
+    
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
