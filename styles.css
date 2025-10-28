@@ -350,3 +350,33 @@ select {
 .rank-1 { color: #FFD700; font-weight: bold; } 
 .rank-2 { color: #C0C0C0; font-weight: bold; } 
 .rank-3 { color: #CD7F32; font-weight: bold; }
+
+/* --- Penyesuaian Lebar Kolom (Untuk Membuat Tabel Leaderboard Lebih Compact) --- */
+
+/* Kolom untuk Medali (Kolom ke-2, ke-3, ke-4, ke-5) */
+#leaderboard-table th:nth-child(2),
+#leaderboard-table td:nth-child(2),
+#leaderboard-table th:nth-child(3),
+#leaderboard-table td:nth-child(3),
+#leaderboard-table th:nth-child(4),
+#leaderboard-table td:nth-child(4),
+#leaderboard-table th:nth-child(5),
+#leaderboard-table td:nth-child(5) {
+    width: 45px; /* Menetapkan lebar yang sangat sempit */
+    text-align: center; /* Memastikan ikon di tengah kolom */
+    min-width: 45px; /* Mencegah kolom ini terlalu kecil */
+}
+
+/* Kolom Skor (Kolom ke-6) */
+#leaderboard-table th:nth-child(6),
+#leaderboard-table td:nth-child(6) {
+    width: 70px; /* Sedikit lebih lebar untuk angka skor */
+    text-align: right; /* Skor biasanya diratakan kanan */
+    min-width: 70px; 
+}
+
+/* Kolom Nama Tim (Kolom ke-1) akan secara otomatis mengambil semua sisa lebar yang tersedia */
+#leaderboard-table th:nth-child(1),
+#leaderboard-table td:nth-child(1) {
+    width: auto; 
+}
