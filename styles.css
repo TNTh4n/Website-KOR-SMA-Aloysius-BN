@@ -1,9 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
 
 :root {
-    /* PERBAIKAN: --bg-color diaktifkan 
-      Saya menggunakan warna dari .race-round Anda agar konsisten
-    */
     --bg-color: #0d2165; 
     --card-color: #1d2e80;
     --font-color: #e0e0e0;
@@ -133,7 +130,7 @@ tr:hover {
 }
 
 .countdown-item {
-    background-color: var(--bg-color); /* Sekarang akan berfungsi */
+    background-color: var(--bg-color); 
     padding: 20px;
     border-radius: 8px;
     margin: 10px;
@@ -158,7 +155,7 @@ tr:hover {
 }
 
 .sport-card {
-    background-color: var(--bg-color); /* Sekarang akan berfungsi */
+    background-color: var(--bg-color); 
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -202,13 +199,13 @@ tr:hover {
 
 .gallery-item figcaption {
     padding: 10px;
-    background-color: var(--bg-color); /* Sekarang akan berfungsi */
+    background-color: var(--bg-color); 
     font-style: italic;
     font-size: 0.9em;
     text-align: center;
 }
 
-/* Bracket */
+/* Bracket Controls */
 .bracket-controls, .roster-controls {
     margin-bottom: 20px;
 }
@@ -227,33 +224,42 @@ select {
     border: none;
 }
 
+/* --- PERBAIKAN BRACKET POHON (TREE BRACKET) --- */
 .bracket-container {
     display: flex;
     overflow-x: auto;
     padding: 20px;
-    background-color: var(--bg-color); /* Sekarang akan berfungsi */
+    background-color: var(--bg-color); 
     border-radius: 8px;
+    min-height: 400px; /* Tambahkan min-height agar terlihat */
 }
 
 .bracket-round {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    /* Ubah dari space-around ke flex-start dan gunakan gap/margin */
+    justify-content: flex-start; 
     min-width: 200px;
     margin-right: 40px;
+    /* Tambahkan jarak antar elemen di dalam round */
+    gap: 40px; 
 }
 
 .bracket-round h3 {
     text-align: center;
     color: var(--secondary-color);
+    /* Set margin agar judul tidak terlalu menempel ke match pertama */
+    margin-bottom: 20px; 
 }
 
 .bracket-match {
     background-color: var(--card-color);
     border-radius: 5px;
-    margin-bottom: 20px;
+    width: 180px; /* Lebar tetap agar terlihat seperti kotak */
     border: 1px solid var(--border-color);
     position: relative;
+    /* Hapus margin-bottom yang sudah diganti oleh gap di .bracket-round */
+    margin-bottom: 0; 
 }
 
 .bracket-team {
@@ -278,6 +284,7 @@ select {
 .bracket-team:first-child {
     border-bottom: 1px solid var(--border-color);
 }
+/* --- AKHIR PERBAIKAN BRACKET POHON --- */
 
 /* Loading Spinner */
 .loader {
@@ -301,11 +308,11 @@ select {
 }
 
 .race-round-container.final {
-    grid-template-columns: 1fr; /* Final mengambil lebar penuh */
+    grid-template-columns: 1fr; 
 }
 
 .race-round {
-    background-color: var(--bg-color); /* Menggunakan variabel yang sudah benar */
+    background-color: var(--bg-color); 
     padding: 15px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -319,7 +326,6 @@ select {
     padding-bottom: 10px;
 }
 
-/* Menggunakan kembali styling tabel yang ada */
 .race-round table {
     margin-top: 0;
 }
@@ -332,14 +338,12 @@ select {
     padding: 10px 12px;
 }
 
-/* Menyorot pemenang kualifikasi */
 .race-winner td {
     font-weight: bold;
     color: var(--secondary-color);
-    background-color: #2e2e9b; /* Warna tr:nth-child(even) */
+    background-color: #2e2e9b; 
 }
 
-/* Styling untuk Peringkat Final */
-.rank-1 { color: #FFD700; font-weight: bold; } /* Emas */
-.rank-2 { color: #C0C0C0; font-weight: bold; } /* Perak */
-.rank-3 { color: #CD7F32; font-weight: bold; } /* Perunggu */
+.rank-1 { color: #FFD700; font-weight: bold; } 
+.rank-2 { color: #C0C0C0; font-weight: bold; } 
+.rank-3 { color: #CD7F32; font-weight: bold; }
