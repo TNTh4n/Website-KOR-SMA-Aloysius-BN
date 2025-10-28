@@ -242,7 +242,7 @@ select {
     min-width: 200px;
     margin-right: 40px;
     /* Tambahkan jarak antar elemen di dalam round */
-    gap: 0px; 
+    gap: 40px; 
 }
 
 .bracket-round h3 {
