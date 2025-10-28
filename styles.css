@@ -370,9 +370,9 @@ select {
 /* Kolom Skor (Kolom ke-6) */
 #leaderboard-table th:nth-child(6),
 #leaderboard-table td:nth-child(6) {
-    width: 70px; /* Sedikit lebih lebar untuk angka skor */
+    width: 40px; /* Sedikit lebih lebar untuk angka skor */
     text-align: right; /* Skor biasanya diratakan kanan */
-    max-width: 70px; 
+    max-width: 40px; 
 }
 
 /* Kolom Nama Tim (Kolom ke-1) akan secara otomatis mengambil semua sisa lebar yang tersedia */
