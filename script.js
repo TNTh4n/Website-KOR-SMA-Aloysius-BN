@@ -79,9 +79,20 @@ async function loadLeaderboard() {
         }).sort((a, b) => b.totalPoints - a.totalPoints);
         
         tbody.innerHTML = ''; 
-        sortedData.forEach(row => {
+        sortedData.forEach((row, index) => { // MENGGUNAKAN INDEX UNTUK MENENTUKAN RANK
+            // Logika penentuan kelas untuk Top 3
+            let rankClass = '';
+            if (index === 0) {
+                rankClass = 'rank-1-row';
+            } else if (index === 1) {
+                rankClass = 'rank-2-row';
+            } else if (index === 2) {
+                rankClass = 'rank-3-row';
+            }
+            const rankClassAttr = rankClass ? `class="${rankClass}"` : ''; // Siapkan attribute class
+            
             const tr = `
-                <tr>
+                <tr ${rankClassAttr}>
                     <td>${row['Team Name'] || '-'}</td>
                     <td>${row.p1}</td>
                     <td>${row.p2}</td>
@@ -282,7 +293,7 @@ function renderRaceBracket(sportName) {
         
         if (gradeResults.length === 0) {
             table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead>
-                               <tbody><tr><td colspan="2">Belum ada data.</td></tr></tbody>`;
+                                <tbody><tr><td colspan="2">Belum ada data.</td></tr></tbody>`;
             return;
         }
 
@@ -541,96 +552,4 @@ async function renderRoster(teamName) {
             rosterBody.innerHTML += tr;
         });
         
-        rosterTable.style.display = 'table';
-        teamLoader.style.display = 'none';
-    } else {
-        rosterTable.style.display = 'none';
-        teamLoader.style.display = 'block';
-        teamLoader.innerText = `Tidak ada daftar pemain terdaftar untuk ${teamName}. Cek sheet "Rosters".`;
-    }
-}
-
-// --- 6. SPORTS INFO ---
-async function loadSportsInfo() {
-    const loader = document.getElementById('sports-loader');
-    const container = document.getElementById('sports-container');
-    
-    const data = await fetchSheetData('Sports');
-
-    if (data.length > 0) {
-        loader.style.display = 'none';
-        container.innerHTML = '';
-        data.forEach(sport => {
-            const rulesLink = sport['Rules'] ? `<a href="${sport['Rules']}" target="_blank">Juknis</a>` : 'N/A';
-            const card = `
-                <div class="sport-card">
-                    <img src="${sport['Image URL'] || 'https://via.placeholder.com/300x200?text=Sport'}" alt="${sport['Sport Name']}">
-                    <div class="sport-card-content">
-                        <h3>${sport['Sport Name'] || '-'}</h3>
-                        <p><strong>Deskripsi:</strong> ${sport['Description'] || '-'}</p>
-                        <p><strong>Aturan:</strong> ${rulesLink}</p>
-                        <p><strong>Tim:</strong> ${sport['Number of Teams'] || '-'} | <strong>Durasi:</strong> ${sport['Duration'] || '-'}</p>
-                        <p><strong>Kondisi Menang:</strong> ${sport['Winning Conditions'] || '-'}</p>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += card;
-        });
-    } else {
-        loader.innerText = 'Gagal memuat data Sports atau data kosong. Cek sheet "Sports".';
-    }
-}
-
-// --- 7. GALLERY ---
-async function loadGallery() {
-    const loader = document.getElementById('gallery-loader');
-    const container = document.getElementById('gallery-container');
-    
-    const data = await fetchSheetData('Gallery');
-    
-    if (data.length > 0) {
-        loader.style.display = 'none';
-        container.innerHTML = '';
-        data.forEach(item => {
-            const dateObj = parseGvizDate(item['Date']);
-            const date = dateObj ? dateObj.toLocaleDateString('id-ID') : '';
-
-            const galleryItem = `
-                <figure class="gallery-item">
-                    <img src="${item['Image URL'] || 'https://via.placeholder.com/250x200?text=Image'}" alt="${item['Caption']}">
-                    <figcaption>
-                        ${item['Caption'] || ''}
-                        <small style="display:block; margin-top: 5px;">${date}</small>
-                    </figcaption>
-                </figure>
-            `;
-            container.innerHTML += galleryItem;
-        });
-    } else {
-        loader.innerText = 'Gagal memuat data Gallery atau data kosong. Cek sheet "Gallery".';
-    }
-}
-
-// --- Inisialisasi Website ---
-document.addEventListener('DOMContentLoaded', () => {
-    loadLeaderboard();
-    loadBracketData(); 
-    loadSchedule();
-    loadCountdown();
-    loadRoster(); 
-    loadSportsInfo();
-    loadGallery();
-    
-    // Smooth scroll untuk navigasi
-    document.querySelectorAll('nav a').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetElement = document.querySelector(this.getAttribute('href'));
-            if(targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});
+        rosterTable.
