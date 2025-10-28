@@ -224,43 +224,49 @@ select {
     border: none;
 }
 
-/* --- PERBAIKAN BRACKET POHON (TREE BRACKET) --- */
+/* Bracket */
+/* ... kode sebelumnya ... */
+
 .bracket-container {
     display: flex;
     overflow-x: auto;
     padding: 20px;
-    background-color: var(--bg-color); 
+    background-color: var(--bg-color);
     border-radius: 8px;
-    min-height: 400px; /* Tambahkan min-height agar terlihat */
+    min-height: 400px; /* Tambahkan ini agar ada ruang */
+    align-items: flex-start; /* Tambahkan ini agar konten dimulai dari atas */
 }
 
 .bracket-round {
     display: flex;
     flex-direction: column;
-    /* Ubah dari space-around ke flex-start dan gunakan gap/margin */
+    /* GANTI INI! Dari space-around ke flex-start */
     justify-content: flex-start; 
     min-width: 200px;
     margin-right: 40px;
-    /* Tambahkan jarak antar elemen di dalam round */
+    
+    /* TAMBAHKAN GAP (Jarak vertikal antar match) */
     gap: 40px; 
 }
 
 .bracket-round h3 {
     text-align: center;
     color: var(--secondary-color);
-    /* Set margin agar judul tidak terlalu menempel ke match pertama */
-    margin-bottom: 20px; 
+    margin-bottom: 0; /* Hapus margin bawah agar gap yang bekerja */
 }
 
 .bracket-match {
     background-color: var(--card-color);
     border-radius: 5px;
-    width: 180px; /* Lebar tetap agar terlihat seperti kotak */
+    width: 180px; /* Tetapkan lebar agar terlihat seperti kotak */
+    /* HAPUS/GANTI margin-bottom (agar gap bekerja) */
+    /* margin-bottom: 20px; */ 
     border: 1px solid var(--border-color);
     position: relative;
-    /* Hapus margin-bottom yang sudah diganti oleh gap di .bracket-round */
-    margin-bottom: 0; 
+    box-sizing: border-box;
 }
+
+/* ... kode setelahnya ... */
 
 .bracket-team {
     padding: 10px;
