@@ -1,11 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+
 :root {
-    /* --bg-color: #054ad0; */
-    --card-color: #1d2e80; /*16213e*/
+    /* PERBAIKAN: --bg-color diaktifkan 
+      Saya menggunakan warna dari .race-round Anda agar konsisten
+    */
+    --bg-color: #0d2165; 
+    --card-color: #1d2e80;
     --font-color: #e0e0e0;
     --header-color: #ffffff;
-    --primary-color: #0f3460; /*origin: 0f3460*/
-    --secondary-color: #ffde59; /*origin: e94560*/
+    --primary-color: #0f3460;
+    --secondary-color: #ffde59;
     --border-color: #535353;
 }
 
@@ -17,7 +21,6 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    /* background-color: var(--bg-color); */
     color: var(--font-color);
     margin: 0;
     padding: 0;
@@ -39,27 +42,26 @@ h1, h2 {
     border-bottom: 2px solid var(--secondary-color);
     padding-bottom: 10px;
 }
+
 /* Styling Keterangan Poin */
 #point-explanation {
-    background-color: #2a2a4a; /* Warna latar belakang sedikit lebih gelap */
-    padding: 8px 12px; /* Dikecilkan sedikit */
-    margin-top: 15px; /* Tambahkan sedikit jarak dari tabel */
+    background-color: #2a2a4a;
+    padding: 8px 12px;
+    margin-top: 15px;
     margin-bottom: 20px;
     border-radius: 6px;
-    
-    /* MODIFIKASI: FONT-SIZE DIKECILKAN */
     font-size: 0.85em; 
-    
     color: #ffffff;
     display: flex; 
     flex-wrap: wrap;
-    gap: 10px; /* Jarak antar item poin dikecilkan */
+    gap: 10px;
     justify-content: center;
 }
 
 .point-item {
     font-weight: bold;
 }
+
 /* Navigation */
 nav {
     background-color: var(--card-color);
@@ -131,7 +133,7 @@ tr:hover {
 }
 
 .countdown-item {
-    background-color: var(--bg-color);
+    background-color: var(--bg-color); /* Sekarang akan berfungsi */
     padding: 20px;
     border-radius: 8px;
     margin: 10px;
@@ -156,7 +158,7 @@ tr:hover {
 }
 
 .sport-card {
-    background-color: var(--bg-color);
+    background-color: var(--bg-color); /* Sekarang akan berfungsi */
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -200,7 +202,7 @@ tr:hover {
 
 .gallery-item figcaption {
     padding: 10px;
-    background-color: var(--bg-color);
+    background-color: var(--bg-color); /* Sekarang akan berfungsi */
     font-style: italic;
     font-size: 0.9em;
     text-align: center;
@@ -229,7 +231,7 @@ select {
     display: flex;
     overflow-x: auto;
     padding: 20px;
-    background-color: var(--bg-color);
+    background-color: var(--bg-color); /* Sekarang akan berfungsi */
     border-radius: 8px;
 }
 
@@ -284,14 +286,6 @@ select {
     padding: 20px;
 }
 
-### Langkah 3: Perbarui File `styles.css`
-
-Tambahkan *styling* baru ini di akhir file `styles.css` Anda untuk *bracket* balap.
-
-```css
-/* ... [CSS Anda sebelumnya] ... */
-
-/* [Tambahkan CSS BARU di bawah ini] */
 
 /* Styling untuk Bracket Balap (Race) */
 .race-container {
@@ -311,7 +305,7 @@ Tambahkan *styling* baru ini di akhir file `styles.css` Anda untuk *bracket* bal
 }
 
 .race-round {
-    background-color: #0d2165; /* Warna --bg-color yang Anda definisikan */
+    background-color: var(--bg-color); /* Menggunakan variabel yang sudah benar */
     padding: 15px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
