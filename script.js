@@ -107,126 +107,6 @@ async function loadLeaderboard() {
     }
 }
 
-// --- 2. BRACKET ---
-let allSportsData = [];
-let allBracketsData = [];
-
-async function loadBracketData() {
-    const sportSelect = document.getElementById('sport-select');
-    
-    // 1. Fetch data olahraga untuk dropdown (Sheet: Sports)
-    allSportsData = await fetchSheetData('Sports');
-    
-    if (allSportsData.length > 0) {
-        sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
-        allSportsData.forEach(sport => {
-            sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
-        });
-    } else {
-        sportSelect.innerHTML = '<option value="">Gagal memuat daftar olahraga</option>';
-    }
-
-    // 2. Fetch semua data bracket (Sheet: Brackets)
-    allBracketsData = await fetchSheetData('Brackets');
-    
-    // 3. Tambah event listener ke dropdown
-    sportSelect.addEventListener('change', (e) => {
-        renderBracket(e.target.value);
-    });
-}
-
-function renderBracket(sportName) {
-    const bracketMain = document.getElementById('bracket-main');
-    const loader = document.getElementById('bracket-loader');
-
-    if (!sportName) {
-        bracketMain.style.display = 'none';
-        loader.style.display = 'block';
-        loader.innerText = 'Pilih olahraga untuk melihat bracket.';
-        return;
-    }
-
-    // Filter data bracket berdasarkan nama olahraga
-    const sportBrackets = allBracketsData.filter(match => match['Sport'] === sportName);
-    
-    if (sportBrackets.length === 0) {
-        bracketMain.style.display = 'none';
-        loader.style.display = 'block';
-        loader.innerText = `Belum ada data bracket untuk ${sportName}.`;
-        return;
-    }
-
-    loader.style.display = 'none';
-    bracketMain.style.display = 'flex';
-    
-    // Kosongkan semua match
-    for(let i=1; i<=8; i++) {
-        const matchEl = document.getElementById(`match-${i}`);
-        if (matchEl) matchEl.innerHTML = '';
-    }
-    const matchWinnerEl = document.getElementById('match-winner');
-    if (matchWinnerEl) matchWinnerEl.innerHTML = '';
-
-    // Map data ke match
-    const matchMap = {};
-    sportBrackets.forEach(match => {
-        matchMap[match['Match Number']] = match;
-    });
-    
-    // Fungsi helper untuk membuat HTML tim
-    const createTeamHTML = (team, score, isWinner) => {
-        if (!team) return '<div class="bracket-team">&nbsp;</div>';
-        const winnerClass = isWinner ? 'winner' : '';
-        return `
-            <div class="bracket-team ${winnerClass}">
-                <span class="team-name">${team}</span>
-                <span class="team-score">${score !== null ? score : ''}</span>
-            </div>
-        `;
-    };
-    
-    // Fungsi helper untuk mengisi match
-    const fillMatch = (matchId, matchData) => {
-        const matchEl = document.getElementById(`match-${matchId}`);
-        if (!matchEl) return;
-
-        if (!matchData) {
-            matchEl.innerHTML = createTeamHTML(null) + createTeamHTML(null);
-            return;
-        }
-        
-        const winner = matchData['Winner'];
-        const team1 = matchData['Team 1'];
-        const team2 = matchData['Team 2'];
-        const score1 = matchData['Score 1'];
-        const score2 = matchData['Score 2'];
-
-        matchEl.innerHTML = `
-            ${createTeamHTML(team1, score1, winner === team1)}
-            ${createTeamHTML(team2, score2, winner === team2)}
-        `;
-    };
-
-    // Isi semua match (asumsi 8 pertandingan total)
-    fillMatch(1, matchMap[1]);
-    fillMatch(2, matchMap[2]);
-    fillMatch(3, matchMap[3]);
-    fillMatch(4, matchMap[4]);
-    fillMatch(5, matchMap[5]); // Semi
-    fillMatch(6, matchMap[6]); // Semi
-    fillMatch(7, matchMap[7]); // 3rd Place
-    fillMatch(8, matchMap[8]); // Final
-    
-    // Isi Winner
-    const finalMatch = matchMap[8];
-    if (finalMatch && finalMatch['Winner']) {
-        document.getElementById('match-winner').innerHTML = createTeamHTML(finalMatch['Winner'], null, true);
-    } else {
-        document.getElementById('match-winner').innerHTML = createTeamHTML(null);
-    }
-}
-
-
 // --- 3. SCHEDULE ---
 async function loadSchedule() {
     const loader = document.getElementById('schedule-loader');
@@ -507,6 +387,248 @@ async function loadGallery() {
 document.addEventListener('DOMContentLoaded', () => {
     loadLeaderboard();
     loadBracketData();
+    loadSchedule();
+    loadCountdown();
+    loadRoster(); 
+    loadSportsInfo();
+    loadGallery();
+    
+    // Smooth scroll untuk navigasi
+    document.querySelectorAll('nav a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+
+
+// ... [Kode JS Anda sebelumnya: fetchSheetData, parseGvizData, parseGvizDate, loadLeaderboard] ...
+
+// --- 2. BRACKET (DIMODIFIKASI) ---
+let allSportsData = [];
+let allBracketsData = [];
+let allRaceData = []; // BARU: Simpan data balap
+
+async function loadBracketData() {
+    const sportSelect = document.getElementById('sport-select');
+    
+    // 1. Fetch data olahraga (SUDAH ADA)
+    allSportsData = await fetchSheetData('Sports');
+    
+    if (allSportsData.length > 0) {
+        sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
+        allSportsData.forEach(sport => {
+            sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
+        });
+    } else {
+        sportSelect.innerHTML = '<option value="">Gagal memuat daftar olahraga</option>';
+    }
+
+    // 2. Fetch data bracket POHON (SUDAH ADA)
+    allBracketsData = await fetchSheetData('Brackets');
+    
+    // 3. BARU: Fetch data bracket BALAP
+    allRaceData = await fetchSheetData('RaceResults');
+
+    // 4. Tambah event listener (SUDAH ADA)
+    sportSelect.addEventListener('change', (e) => {
+        // Ganti pemanggilan renderBracket ke renderBracketRouter
+        renderBracketRouter(e.target.value); 
+    });
+}
+
+// BARU: Fungsi Router untuk memilih tipe bracket
+function renderBracketRouter(sportName) {
+    const bracketTree = document.getElementById('bracket-main');
+    const bracketRace = document.getElementById('bracket-race');
+    const loader = document.getElementById('bracket-loader');
+
+    if (!sportName) {
+        bracketTree.style.display = 'none';
+        bracketRace.style.display = 'none';
+        loader.style.display = 'block';
+        loader.innerText = 'Pilih olahraga untuk melihat bracket.';
+        return;
+    }
+
+    // Cari tipe bracket dari data Sports
+    const sportInfo = allSportsData.find(s => s['Sport Name'] === sportName);
+    const bracketType = sportInfo ? sportInfo['Bracket Type'] : 'Tree'; // Default 'Tree'
+
+    loader.style.display = 'none';
+
+    if (bracketType === 'Race') {
+        // Tampilkan Bracket Balap
+        bracketTree.style.display = 'none';
+        bracketRace.style.display = 'block';
+        renderRaceBracket(sportName); // Panggil fungsi balap baru
+    } else {
+        // Tampilkan Bracket Pohon (Logika lama)
+        bracketRace.style.display = 'none';
+        // bracketTree.style.display = 'flex'; // Dihapus, biarkan fungsi renderBracket (lama) yg atur
+        renderBracketTree(sportName); // Panggil fungsi pohon (logika lama)
+    }
+}
+
+// GANTI NAMA: Fungsi lama Anda diubah namanya menjadi renderBracketTree
+function renderBracketTree(sportName) {
+    const bracketMain = document.getElementById('bracket-main'); // Ubah nama variabel
+    const loader = document.getElementById('bracket-loader');
+
+    // Filter data bracket berdasarkan nama olahraga
+    const sportBrackets = allBracketsData.filter(match => match['Sport'] === sportName);
+    
+    if (sportBrackets.length === 0) {
+        bracketMain.style.display = 'none';
+        loader.style.display = 'block';
+        loader.innerText = `Belum ada data bracket untuk ${sportName}.`;
+        return;
+    }
+
+    loader.style.display = 'none';
+    bracketMain.style.display = 'flex'; // Pindahkan ini ke sini
+    
+    // ... [Sisa kode renderBracketTree Anda (logika lama dari fillMatch, createTeamHTML, dll.) TIDAK BERUBAH] ...
+    // ...
+    // Map data ke match
+    const matchMap = {};
+    sportBrackets.forEach(match => {
+        matchMap[match['Match Number']] = match;
+    });
+    
+    // Fungsi helper untuk membuat HTML tim
+    const createTeamHTML = (team, score, isWinner) => {
+        if (!team) return '<div class="bracket-team">&nbsp;</div>';
+        const winnerClass = isWinner ? 'winner' : '';
+        return `
+            <div class="bracket-team ${winnerClass}">
+                <span class="team-name">${team}</span>
+                <span class="team-score">${score !== null ? score : ''}</span>
+            </div>
+        `;
+    };
+    
+    // Fungsi helper untuk mengisi match
+    const fillMatch = (matchId, matchData) => {
+        const matchEl = document.getElementById(`match-${matchId}`);
+        if (!matchEl) return;
+
+        if (!matchData) {
+            matchEl.innerHTML = createTeamHTML(null) + createTeamHTML(null);
+            return;
+        }
+        
+        const winner = matchData['Winner'];
+        const team1 = matchData['Team 1'];
+        const team2 = matchData['Team 2'];
+        const score1 = matchData['Score 1'];
+        const score2 = matchData['Score 2'];
+
+        matchEl.innerHTML = `
+            ${createTeamHTML(team1, score1, winner === team1)}
+            ${createTeamHTML(team2, score2, winner === team2)}
+        `;
+    };
+
+    // Isi semua match (asumsi 8 pertandingan total)
+    fillMatch(1, matchMap[1]);
+    fillMatch(2, matchMap[2]);
+    fillMatch(3, matchMap[3]);
+    fillMatch(4, matchMap[4]);
+    fillMatch(5, matchMap[5]); // Semi
+    fillMatch(6, matchMap[6]); // Semi
+    fillMatch(7, matchMap[7]); // 3rd Place
+    fillMatch(8, matchMap[8]); // Final
+    
+    // Isi Winner
+    const finalMatch = matchMap[8];
+    if (finalMatch && finalMatch['Winner']) {
+        document.getElementById('match-winner').innerHTML = createTeamHTML(finalMatch['Winner'], null, true);
+    } else {
+        document.getElementById('match-winner').innerHTML = createTeamHTML(null);
+    }
+}
+
+
+// --- FUNGSI BARU UNTUK BRACKET BALAP ---
+function renderRaceBracket(sportName) {
+    // 1. Filter data dari 'RaceResults'
+    const results = allRaceData.filter(r => r['Sport'] === sportName);
+    
+    const r1Results = results.filter(r => r['Round'] == 1);
+    const r2Results = results.filter(r => r['Round'] == 2);
+
+    // 2. Helper untuk format waktu (ms ke detik)
+    const formatTime = (ms) => {
+        if (ms === null || isNaN(ms)) return "N/A";
+        return (ms / 1000).toFixed(3) + "s";
+    };
+
+    // 3. Fungsi untuk mengisi tabel Round 1
+    const populateRound1 = (grade, elementId) => {
+        const tableBody = document.getElementById(elementId);
+        const gradeResults = r1Results
+            .filter(r => r['Team Name'] && r['Team Name'].startsWith(grade))
+            .sort((a, b) => a['Time (ms)'] - b['Time (ms)']); // Urutkan berdasarkan waktu
+        
+        if (gradeResults.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="2">Belum ada data.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
+        const tbody = tableBody.querySelector('tbody');
+
+        gradeResults.forEach((team, index) => {
+            // Tandai pemenang (waktu tercepat)
+            const winnerClass = index === 0 ? 'class="race-winner"' : ''; 
+            tbody.innerHTML += `
+                <tr ${winnerClass}>
+                    <td>${team['Team Name']}</td>
+                    <td>${formatTime(team['Time (ms)'])}</td>
+                </tr>
+            `;
+        });
+    };
+
+    // 4. Panggil fungsi untuk setiap angkatan
+    populateRound1('Kelas X', 'race-round-X');
+    populateRound1('Kelas XI', 'race-round-XI');
+    populateRound1('Kelas XII', 'race-round-XII');
+
+    // 5. Fungsi untuk mengisi tabel Final (Round 2)
+    const tableFinal = document.getElementById('race-round-Final');
+    if (r2Results.length === 0) {
+        tableFinal.innerHTML = `<tr><td colspan="3">Menunggu hasil kualifikasi.</td></tr>`;
+        return;
+    }
+
+    // Urutkan berdasarkan Rank
+    const finalResults = r2Results.sort((a, b) => a['Rank'] - b['Rank']);
+
+    tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
+    const tbodyFinal = tableFinal.querySelector('tbody');
+    
+    finalResults.forEach(team => {
+        tbodyFinal.innerHTML += `
+            <tr>
+                <td class="rank-${team['Rank']}">🥇 ${team['Rank']}</td>
+                <td class="rank-${team['Rank']}">${team['Team Name']}</td>
+                <td class="rank-${team['Rank']}">${formatTime(team['Time (ms)'])}</td>
+            </tr>
+        `;
+    });
+}
+
+// ... [Sisa kode JS Anda: loadSchedule, loadCountdown, loadRoster, loadSportsInfo, loadGallery, dan EventListener 'DOMContentLoaded'] ...
+// ...
+// PASTIKAN FUNGSI renderBracket diganti namanya di dalam 'DOMContentLoaded'
+document.addEventListener('DOMContentLoaded', () => {
+    loadLeaderboard();
+    loadBracketData(); // Ini akan memanggil loadBracketData (baru)
     loadSchedule();
     loadCountdown();
     loadRoster(); 
