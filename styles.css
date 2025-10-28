@@ -378,5 +378,7 @@ select {
 /* Kolom Nama Tim (Kolom ke-1) akan secara otomatis mengambil semua sisa lebar yang tersedia */
 #leaderboard-table th:nth-child(1),
 #leaderboard-table td:nth-child(1) {
-    width: auto; 
+    width: 70px; /* Sedikit lebih lebar untuk angka skor */
+    text-align: right; /* Skor biasanya diratakan kanan */
+    min-width: 70px; ; 
 }
