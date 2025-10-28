@@ -205,7 +205,7 @@ tr:hover {
     text-align: center;
 }
 
-/* Bracket Controls */
+/* Bracket */
 .bracket-controls, .roster-controls {
     margin-bottom: 20px;
 }
@@ -218,14 +218,11 @@ tr:hover {
 select {
     padding: 8px 12px;
     border-radius: 5px;
-    background-color: #2a2a4a;
-    color: #fff;
+    background-color: var(--font-color);
+    color: var(--bg-color);
     font-size: 1em;
     border: none;
 }
-
-/* Bracket */
-/* ... kode sebelumnya ... */
 
 .bracket-container {
     display: flex;
@@ -233,40 +230,28 @@ select {
     padding: 20px;
     background-color: var(--bg-color);
     border-radius: 8px;
-    min-height: 400px; /* Tambahkan ini agar ada ruang */
-    align-items: flex-start; /* Tambahkan ini agar konten dimulai dari atas */
 }
 
 .bracket-round {
     display: flex;
     flex-direction: column;
-    /* GANTI INI! Dari space-around ke flex-start */
-    justify-content: flex-start; 
+    justify-content: space-around;
     min-width: 200px;
     margin-right: 40px;
-    
-    /* TAMBAHKAN GAP (Jarak vertikal antar match) */
-    gap: 40px; 
 }
 
 .bracket-round h3 {
     text-align: center;
     color: var(--secondary-color);
-    margin-bottom: 0; /* Hapus margin bawah agar gap yang bekerja */
 }
 
 .bracket-match {
     background-color: var(--card-color);
     border-radius: 5px;
-    width: 180px; /* Tetapkan lebar agar terlihat seperti kotak */
-    /* HAPUS/GANTI margin-bottom (agar gap bekerja) */
-    /* margin-bottom: 20px; */ 
+    margin-bottom: 20px;
     border: 1px solid var(--border-color);
     position: relative;
-    box-sizing: border-box;
 }
-
-/* ... kode setelahnya ... */
 
 .bracket-team {
     padding: 10px;
@@ -290,7 +275,6 @@ select {
 .bracket-team:first-child {
     border-bottom: 1px solid var(--border-color);
 }
-/* --- AKHIR PERBAIKAN BRACKET POHON --- */
 
 /* Loading Spinner */
 .loader {
@@ -298,7 +282,6 @@ select {
     font-size: 1.2em;
     padding: 20px;
 }
-
 
 /* Styling untuk Bracket Balap (Race) */
 .race-container {
