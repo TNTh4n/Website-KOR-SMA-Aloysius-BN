@@ -43,7 +43,7 @@ function parseGvizData(table) {
     });
 }
 
-// Fungsi untuk menangani format tanggal yang aneh dari Gviz (Versi Diperbarui)
+// Fungsi untuk menangani format tanggal yang aneh dari Gviz
 function parseGvizDate(dateValue) {
     if (typeof dateValue === 'string' && dateValue.startsWith('Date(')) {
         const parts = dateValue.substring(5, dateValue.length - 1).split(',');
@@ -100,10 +100,10 @@ async function loadLeaderboard() {
     }
 }
 
-// --- 2. BRACKET (DIMODIFIKASI) ---
+// --- 2. BRACKET ---
 let allSportsData = [];
 let allBracketsData = [];
-let allRaceData = []; // BARU: Simpan data balap
+let allRaceData = [];
 
 async function loadBracketData() {
     const sportSelect = document.getElementById('sport-select');
@@ -114,7 +114,6 @@ async function loadBracketData() {
     if (allSportsData.length > 0) {
         sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
         allSportsData.forEach(sport => {
-            // Pastikan 'Sport Name' tidak null atau undefined
             if(sport['Sport Name']) {
                 sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
             }
@@ -126,7 +125,7 @@ async function loadBracketData() {
     // 2. Fetch data bracket POHON
     allBracketsData = await fetchSheetData('Brackets');
     
-    // 3. BARU: Fetch data bracket BALAP
+    // 3. Fetch data bracket BALAP
     allRaceData = await fetchSheetData('RaceResults');
 
     // 4. Tambah event listener
@@ -135,7 +134,7 @@ async function loadBracketData() {
     });
 }
 
-// BARU: Fungsi Router untuk memilih tipe bracket
+// Fungsi Router untuk memilih tipe bracket
 function renderBracketRouter(sportName) {
     const bracketTree = document.getElementById('bracket-main');
     const bracketRace = document.getElementById('bracket-race');
@@ -151,7 +150,6 @@ function renderBracketRouter(sportName) {
 
     // Cari tipe bracket dari data Sports
     const sportInfo = allSportsData.find(s => s['Sport Name'] === sportName);
-    // Default ke 'Tree' jika 'Bracket Type' kosong atau tidak ditemukan
     const bracketType = (sportInfo && sportInfo['Bracket Type']) ? sportInfo['Bracket Type'] : 'Tree'; 
 
     loader.style.display = 'none';
@@ -160,15 +158,15 @@ function renderBracketRouter(sportName) {
         // Tampilkan Bracket Balap
         bracketTree.style.display = 'none';
         bracketRace.style.display = 'block';
-        renderRaceBracket(sportName); // Panggil fungsi balap baru
+        renderRaceBracket(sportName); 
     } else {
-        // Tampilkan Bracket Pohon (Logika lama)
+        // Tampilkan Bracket Pohon
         bracketRace.style.display = 'none';
-        renderBracketTree(sportName); // Panggil fungsi pohon (logika lama)
+        renderBracketTree(sportName); 
     }
 }
 
-// FUNGSI LAMA (diganti nama): renderBracket -> renderBracketTree
+// FUNGSI UNTUK BRACKET POHON
 function renderBracketTree(sportName) {
     const bracketMain = document.getElementById('bracket-main');
     const loader = document.getElementById('bracket-loader');
@@ -246,14 +244,14 @@ function renderBracketTree(sportName) {
 }
 
 
-// --- FUNGSI BARU UNTUK BRACKET BALAP ---
+// FUNGSI UNTUK BRACKET BALAP (SUDAH MENGGUNAKAN ANGKA 10, 11, 12)
 function renderRaceBracket(sportName) {
     const loader = document.getElementById('bracket-loader');
+    
     // 1. Filter data dari 'RaceResults'
     const results = allRaceData.filter(r => r['Sport'] === sportName);
     
     if (results.length === 0) {
-        // Sembunyikan jika tidak ada data
         document.getElementById('bracket-race').style.display = 'none'; 
         loader.style.display = 'block';
         loader.innerText = `Belum ada data hasil balap untuk ${sportName}. Cek sheet "RaceResults".`;
@@ -269,17 +267,17 @@ function renderRaceBracket(sportName) {
         return (ms / 1000).toFixed(3) + "s";
     };
 
-    // 3. Fungsi untuk mengisi tabel Round 1
-    const populateRound1 = (grade, elementId) => {
+    // 3. Fungsi untuk mengisi tabel Round 1 (MENGGUNAKAN ANGKA)
+    const populateRound1 = (gradeNumber, elementId) => {
         const table = document.getElementById(elementId);
         if (!table) return; 
 
-        // =================================================================
-        // INI ADALAH PERBAIKAN KRUSIAL (BUG YANG ANDA ALAMI)
-        // Kita harus mem-filter r1Results LAGI berdasarkan 'grade'
-        // =================================================================
+        // String yang akan dicari: 'Kelas 10', 'Kelas 11', dst.
+        const searchString = `Kelas ${gradeNumber}`; 
+        
         const gradeResults = r1Results
-            .filter(r => r['Team Name'] && r['Team Name'].startsWith(grade))
+            // FILTER KRUSIAL: Mencari string 'Kelas 10' atau 'Kelas 11' di awal nama tim
+            .filter(r => r['Team Name'] && r['Team Name'].startsWith(searchString)) 
             .sort((a, b) => (a['Time (ms)'] || Infinity) - (b['Time (ms)'] || Infinity)); // Urutkan berdasarkan waktu
         
         if (gradeResults.length === 0) {
@@ -304,10 +302,10 @@ function renderRaceBracket(sportName) {
         });
     };
 
-    // 4. Panggil fungsi untuk setiap angkatan
-    populateRound1('Kelas X', 'race-round-X');
-    populateRound1('Kelas XI', 'race-round-XI');
-    populateRound1('Kelas XII', 'race-round-XII');
+    // 4. Panggil fungsi untuk setiap angkatan (MENGGUNAKAN ANGKA)
+    populateRound1(10, 'race-round-X'); // Memanggil dengan angka 10
+    populateRound1(11, 'race-round-XI'); // Memanggil dengan angka 11
+    populateRound1(12, 'race-round-XII'); // Memanggil dengan angka 12
 
     // 5. Fungsi untuk mengisi tabel Final (Round 2)
     const tableFinal = document.getElementById('race-round-Final');
@@ -506,8 +504,6 @@ async function loadRoster() {
                 teamSelect.innerHTML += `<option value="${teamName}">${teamName}</option>`;
             }
         });
-    } else {
-        teamSelect.innerHTML = '<option value="">Tidak ada data tim</option>';
     }
     
     teamSelect.addEventListener('change', (e) => {
@@ -536,7 +532,6 @@ async function renderRoster(teamName) {
     
     if (teamRoster.length > 0) {
         teamRoster.forEach(player => {
-            // Sesuai HTML Anda (Hanya 2 kolom)
             const tr = `
                 <tr>
                     <td>${player['Player Name'] || '-'}</td>
@@ -619,7 +614,7 @@ async function loadGallery() {
 // --- Inisialisasi Website ---
 document.addEventListener('DOMContentLoaded', () => {
     loadLeaderboard();
-    loadBracketData(); // Ini memanggil fungsi bracket baru yang berisi router
+    loadBracketData(); 
     loadSchedule();
     loadCountdown();
     loadRoster(); 
