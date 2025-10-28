@@ -253,6 +253,8 @@ function renderRaceBracket(sportName) {
     const results = allRaceData.filter(r => r['Sport'] === sportName);
     
     if (results.length === 0) {
+        // Sembunyikan jika tidak ada data
+        document.getElementById('bracket-race').style.display = 'none'; 
         loader.style.display = 'block';
         loader.innerText = `Belum ada data hasil balap untuk ${sportName}. Cek sheet "RaceResults".`;
         return;
@@ -270,8 +272,12 @@ function renderRaceBracket(sportName) {
     // 3. Fungsi untuk mengisi tabel Round 1
     const populateRound1 = (grade, elementId) => {
         const table = document.getElementById(elementId);
-        if (!table) return; // Pengaman jika ID tabel salah
+        if (!table) return; 
 
+        // =================================================================
+        // INI ADALAH PERBAIKAN KRUSIAL (BUG YANG ANDA ALAMI)
+        // Kita harus mem-filter r1Results LAGI berdasarkan 'grade'
+        // =================================================================
         const gradeResults = r1Results
             .filter(r => r['Team Name'] && r['Team Name'].startsWith(grade))
             .sort((a, b) => (a['Time (ms)'] || Infinity) - (b['Time (ms)'] || Infinity)); // Urutkan berdasarkan waktu
@@ -284,10 +290,9 @@ function renderRaceBracket(sportName) {
 
         table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
         const tbody = table.querySelector('tbody');
-        tbody.innerHTML = ''; // Kosongkan
+        tbody.innerHTML = ''; 
 
         gradeResults.forEach((team, index) => {
-            // Tandai pemenang (waktu tercepat & valid)
             const isWinner = index === 0 && (team['Time (ms)'] > 0);
             const winnerClass = isWinner ? 'class="race-winner"' : ''; 
             tbody.innerHTML += `
@@ -319,11 +324,11 @@ function renderRaceBracket(sportName) {
 
     tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
     const tbodyFinal = tableFinal.querySelector('tbody');
-    tbodyFinal.innerHTML = ''; // Kosongkan
+    tbodyFinal.innerHTML = ''; 
     
     finalResults.forEach(team => {
         const rank = team['Rank'] || '-';
-        const rankClass = `rank-${rank}`; // Untuk styling emas, perak, perunggu
+        const rankClass = `rank-${rank}`; 
         let rankIcon = rank;
 
         if (rank === 1) rankIcon = '🥇';
@@ -358,8 +363,7 @@ async function loadSchedule() {
         return;
     }
     
-    // Menggunakan Waktu Lokal (Indonesia)
-    const now = new Date();
+    const now = new Date(); // Waktu lokal pengguna
     const today = now.toDateString();
     
     let todayMatches = [];
@@ -384,7 +388,6 @@ async function loadSchedule() {
             </tr>
         `;
         
-        // Cek jika Status adalah 'Cancelled'
         const isCancelled = (row['Status'] || '').toLowerCase() === 'cancelled';
         const statusStyle = isCancelled ? 'style="color: red; text-decoration: line-through;"' : '';
 
