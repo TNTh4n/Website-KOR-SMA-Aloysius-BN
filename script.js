@@ -224,14 +224,14 @@ function renderBracketTree(sportName) {
     };
 
     // Isi semua match
-    fillMatch('match-1', matchMap[1]);
-    fillMatch('match-2', matchMap[2]);
-    fillMatch('match-3', matchMap[3]);
-    fillMatch('match-4', matchMap[4]);
-    fillMatch('match-5', matchMap[5]); // Semi
-    fillMatch('match-6', matchMap[6]); // Semi
-    fillMatch('match-7', matchMap[7]); // 3rd Place
-    fillMatch('match-8', matchMap[8]); // Final
+    fillMatch(1, matchMap[1]);
+    fillMatch(2, matchMap[2]);
+    fillMatch(3, matchMap[3]);
+    fillMatch(4, matchMap[4]);
+    fillMatch(5, matchMap[5]); // Semi
+    fillMatch(6, matchMap[6]); // Semi
+    fillMatch(7, matchMap[7]); // 3rd Place
+    fillMatch(8, matchMap[8]); // Final
     
     // Isi Winner
     const finalMatch = matchMap[8];
