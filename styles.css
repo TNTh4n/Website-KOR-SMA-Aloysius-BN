@@ -121,6 +121,20 @@ tr:hover {
     background-color: #5468cc;
 }
 
+/* Styling untuk Tabel Responsif */
+.table-responsive {
+    overflow-x: auto; /* Ini yang membuat scrollbar muncul */
+    -webkit-overflow-scrolling: touch; /* Meningkatkan scrolling di iOS */
+    margin-top: 15px; /* Menjaga jarak dari elemen atas */
+}
+
+/* Memastikan tabel di dalamnya tidak dikecilkan dan mempertahankan lebar penuhnya */
+.table-responsive table {
+    min-width: 600px; /* Lebar minimum untuk tabel (misalnya, Leaderboard) */
+    width: 100%; 
+    margin-top: 0; /* Mengatur ulang margin yang sudah dipindahkan ke .table-responsive */
+}
+
 /* Countdown */
 #countdown-container {
     display: flex;
