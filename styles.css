@@ -372,25 +372,4 @@ select {
         font-size: 0.7em; /* Font sangat kecil */
         white-space: normal;
     }
-
-    /* 2. Memaksa Kolom Medali (Leaderboard) menjadi sangat sempit */
-    #leaderboard-table th:nth-child(2),
-    #leaderboard-table td:nth-child(2),
-    #leaderboard-table th:nth-child(3),
-    #leaderboard-table td:nth-child(3),
-    #leaderboard-table th:nth-child(4),
-    #leaderboard-table td:nth-child(4),
-    #leaderboard-table th:nth-child(5),
-    #leaderboard-table td:nth-child(5) {
-        width: 25px; 
-        min-width: 25px;
-    }
-
-    /* 3. Memaksa Kolom Skor (Leaderboard) menjadi sempit */
-    #leaderboard-table th:nth-child(6),
-    #leaderboard-table td:nth-child(6) {
-        width: 45px; 
-        min-width: 45px;
-        text-align: center;
-    }
 }
