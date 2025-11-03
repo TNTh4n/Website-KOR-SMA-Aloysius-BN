@@ -115,245 +115,430 @@ async function loadLeaderboard() {
 let allSportsData = [];
 let allBracketsData = [];
 let allRaceData = [];
+let allRoundRobinData = []; // VARIABEL BARU UNTUK ROUND-ROBIN
 
 async function loadBracketData() {
-    const sportSelect = document.getElementById('sport-select');
-    
-    // 1. Fetch data olahraga
-    allSportsData = await fetchSheetData('Sports');
-    
-    if (allSportsData.length > 0) {
-        sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
-        allSportsData.forEach(sport => {
-            if(sport['Sport Name']) {
-                sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
-            }
-        });
-    } else {
-        sportSelect.innerHTML = '<option value="">Gagal memuat daftar olahraga</option>';
-    }
+    const sportSelect = document.getElementById('sport-select');
+    
+    // 1. Fetch data olahraga
+    allSportsData = await fetchSheetData('Sports');
+    
+    if (allSportsData.length > 0) {
+        sportSelect.innerHTML = '<option value="">-- Pilih Olahraga --</option>';
+        allSportsData.forEach(sport => {
+            if(sport['Sport Name']) {
+                sportSelect.innerHTML += `<option value="${sport['Sport Name']}">${sport['Sport Name']}</option>`;
+            }
+        });
+    } else {
+        sportSelect.innerHTML = '<option value="">Gagal memuat daftar olahraga</option>';
+    }
 
-    // 2. Fetch data bracket POHON
-    allBracketsData = await fetchSheetData('Brackets');
-    
-    // 3. Fetch data bracket BALAP
-    allRaceData = await fetchSheetData('RaceResults');
+    // 2. Fetch data bracket POHON
+    allBracketsData = await fetchSheetData('Brackets');
+    
+    // 3. Fetch data bracket BALAP
+    allRaceData = await fetchSheetData('RaceResults');
 
-    // 4. Tambah event listener
-    sportSelect.addEventListener('change', (e) => {
-        renderBracketRouter(e.target.value); 
-    });
+    // 4. Fetch data bracket ROUND ROBIN (ASUMSI SHEET BARU: 'RoundRobinResults')
+    allRoundRobinData = await fetchSheetData('RoundRobinResults');
+
+    // 5. Tambah event listener
+    sportSelect.addEventListener('change', (e) => {
+        renderBracketRouter(e.target.value); 
+    });
 }
 
 // Fungsi Router untuk memilih tipe bracket
 function renderBracketRouter(sportName) {
-    const bracketTree = document.getElementById('bracket-main');
-    const bracketRace = document.getElementById('bracket-race');
-    const loader = document.getElementById('bracket-loader');
+    const bracketTree = document.getElementById('bracket-main');
+    const bracketRace = document.getElementById('bracket-race');
+    const bracketRoundRobin = document.getElementById('bracket-round-robin'); // ELEMEN BARU
+    const loader = document.getElementById('bracket-loader');
 
-    if (!sportName) {
-        bracketTree.style.display = 'none';
-        bracketRace.style.display = 'none';
-        loader.style.display = 'block';
-        loader.innerText = 'Pilih olahraga untuk melihat bracket.';
-        return;
-    }
+    // Sembunyikan semua kontainer bracket
+    bracketTree.style.display = 'none';
+    bracketRace.style.display = 'none';
+    if(bracketRoundRobin) bracketRoundRobin.style.display = 'none'; 
 
-    // Cari tipe bracket dari data Sports
-    const sportInfo = allSportsData.find(s => s['Sport Name'] === sportName);
-    const bracketType = (sportInfo && sportInfo['Bracket Type']) ? sportInfo['Bracket Type'] : 'Tree'; 
+    if (!sportName) {
+        loader.style.display = 'block';
+        loader.innerText = 'Pilih olahraga untuk melihat bracket.';
+        return;
+    }
 
-    loader.style.display = 'none';
+    // Cari tipe bracket dari data Sports
+    const sportInfo = allSportsData.find(s => s['Sport Name'] === sportName);
+    const bracketType = (sportInfo && sportInfo['Bracket Type']) ? sportInfo['Bracket Type'] : 'Tree'; 
 
-    if (bracketType === 'Race') {
-        // Tampilkan Bracket Balap
-        bracketTree.style.display = 'none';
-        bracketRace.style.display = 'block';
-        renderRaceBracket(sportName); 
-    } else {
-        // Tampilkan Bracket Pohon
-        bracketRace.style.display = 'none';
-        renderBracketTree(sportName); 
-    }
+    loader.style.display = 'none';
+
+    if (bracketType === 'Race') {
+        bracketRace.style.display = 'block';
+        renderRaceBracket(sportName); 
+    } else if (bracketType === 'Round-Robin') { // LOGIKA BARU UNTUK ROUND-ROBIN
+        if(bracketRoundRobin) {
+            bracketRoundRobin.style.display = 'block';
+            renderRoundRobinBracket(sportName);
+        } else {
+            // Fallback jika elemen HTML Round-Robin belum ditambahkan
+            loader.style.display = 'block';
+            loader.innerText = `Elemen HTML Klasemen Round-Robin (ID: bracket-round-robin) belum ditambahkan ke file HTML Anda.`;
+        }
+    } else {
+        // Tampilkan Bracket Pohon (Default)
+        renderBracketTree(sportName); 
+    }
 }
 
-// FUNGSI UNTUK BRACKET POHON
-function renderBracketTree(sportName) {
-    const bracketMain = document.getElementById('bracket-main');
-    const loader = document.getElementById('bracket-loader');
+// FUNGSI BARU UNTUK BRACKET ROUND ROBIN (Klasemen)
+function renderRoundRobinBracket(sportName) {
+    const container = document.getElementById('bracket-round-robin');
+    const loader = document.getElementById('round-robin-loader');
+    const tableBody = document.getElementById('round-robin-body');
+    const matchTableBody = document.getElementById('round-robin-matches-body');
+    const table = document.getElementById('round-robin-table');
+    const matchTable = document.getElementById('round-robin-matches-table');
 
-    const sportBrackets = allBracketsData.filter(match => match['Sport'] === sportName);
+    // 1. Filter data pertandingan untuk olahraga ini
+    const matches = allRoundRobinData.filter(m => m['Sport'] === sportName);
     
-    if (sportBrackets.length === 0) {
-        bracketMain.style.display = 'none';
+    // Tampilkan loader sementara jika data kosong
+    if (matches.length === 0) {
         loader.style.display = 'block';
-        loader.innerText = `Belum ada data bracket untuk ${sportName}.`;
+        table.style.display = 'none';
+        matchTable.style.display = 'none';
+        loader.innerText = `Belum ada data pertandingan Round Robin untuk ${sportName}. Cek sheet "RoundRobinResults".`;
         return;
     }
 
     loader.style.display = 'none';
-    bracketMain.style.display = 'flex';
-    
-    // Map data ke match
-    const matchMap = {};
-    sportBrackets.forEach(match => {
-        matchMap[match['Match Number']] = match;
+    table.style.display = 'table';
+    matchTable.style.display = 'table';
+    tableBody.innerHTML = '';
+    matchTableBody.innerHTML = '';
+
+    // 2. Kumpulkan semua nama tim unik
+    const teamsSet = new Set();
+    matches.forEach(m => {
+        if (m['Team 1'] && m['Score 1'] !== null) teamsSet.add(m['Team 1']);
+        if (m['Team 2'] && m['Score 2'] !== null) teamsSet.add(m['Team 2']);
     });
-    
-    // Fungsi helper untuk membuat HTML tim
-    const createTeamHTML = (team, score, isWinner) => {
-        if (!team) return '<div class="bracket-team">&nbsp;</div>';
-        const winnerClass = isWinner ? 'winner' : '';
-        return `
-            <div class="bracket-team ${winnerClass}">
-                <span class="team-name">${team}</span>
-                <span class="team-score">${score !== null ? score : ''}</span>
-            </div>
-        `;
-    };
-    
-    // Fungsi helper untuk mengisi match
-    const fillMatch = (matchId, matchData) => {
-        const matchEl = document.getElementById(`match-${matchId}`);
-        if (!matchEl) return;
+    const teams = Array.from(teamsSet);
 
-        if (!matchData) {
-            matchEl.innerHTML = createTeamHTML(null) + createTeamHTML(null);
-            return;
-        }
+    // 3. Inisialisasi statistik tim
+    const standings = {};
+    teams.forEach(team => {
+        standings[team] = { Pts: 0, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, GD: 0, TeamName: team, matches: [] };
+    });
+
+    // 4. Hitung statistik dari setiap pertandingan
+    matches.forEach(match => {
+        const team1Name = match['Team 1'];
+        const team2Name = match['Team 2'];
+        const score1 = parseInt(match['Score 1']);
+        const score2 = parseInt(match['Score 2']);
         
-        const winner = matchData['Winner'];
-        const team1 = matchData['Team 1'];
-        const team2 = matchData['Team 2'];
-        const score1 = matchData['Score 1'];
-        const score2 = matchData['Score 2'];
+        // Hanya proses jika skor valid (sudah dimainkan)
+        if (standings[team1Name] && standings[team2Name] && !isNaN(score1) && !isNaN(score2)) {
+            const team1 = standings[team1Name];
+            const team2 = standings[team2Name];
 
-        matchEl.innerHTML = `
-            ${createTeamHTML(team1, score1, winner === team1)}
-            ${createTeamHTML(team2, score2, winner === team2)}
-        `;
-    };
+            // Update P (Played) dan GF/GA
+            team1.P += 1;
+            team2.P += 1;
+            team1.GF += score1;
+            team1.GA += score2;
+            team2.GF += score2;
+            team2.GA += score1;
 
-    // Isi semua match
-    fillMatch(1, matchMap[1]);
-    fillMatch(2, matchMap[2]);
-    fillMatch(3, matchMap[3]);
-    fillMatch(4, matchMap[4]);
-    fillMatch(5, matchMap[5]); // Semi
-    fillMatch(6, matchMap[6]); // Semi
-    fillMatch(7, matchMap[7]); // 3rd Place
-    fillMatch(8, matchMap[8]); // Final
-    
-    // Isi Winner
-    const finalMatch = matchMap[8];
-    const winnerEl = document.getElementById('match-winner');
-    if (finalMatch && finalMatch['Winner']) {
-        winnerEl.innerHTML = createTeamHTML(finalMatch['Winner'], null, true);
-    } else {
-        winnerEl.innerHTML = createTeamHTML(null);
-    }
-}
+            // Update W, D, L, Pts
+            if (score1 > score2) { // Team 1 Win
+                team1.W += 1;
+                team1.Pts += 3;
+                team2.L += 1;
+            } else if (score2 > score1) { // Team 2 Win
+                team2.W += 1;
+                team2.Pts += 3;
+                team1.L += 1;
+            } else { // Draw
+                team1.D += 1;
+                team1.Pts += 1;
+                team2.D += 1;
+                team2.Pts += 1;
+            }
 
-
-// FUNGSI UNTUK BRACKET BALAP (SUDAH MENGGUNAKAN ANGKA 10, 11, 12)
-function renderRaceBracket(sportName) {
-    const loader = document.getElementById('bracket-loader');
-    
-    // 1. Filter data dari 'RaceResults'
-    const results = allRaceData.filter(r => r['Sport'] === sportName);
-    
-    if (results.length === 0) {
-        document.getElementById('bracket-race').style.display = 'none'; 
-        loader.style.display = 'block';
-        loader.innerText = `Belum ada data hasil balap untuk ${sportName}. Cek sheet "RaceResults".`;
-        return;
-    }
-
-    const r1Results = results.filter(r => r['Round'] == 1);
-    const r2Results = results.filter(r => r['Round'] == 2);
-
-    // 2. Helper untuk format waktu (ms ke detik)
-    const formatTime = (ms) => {
-        if (ms === null || isNaN(ms) || ms === 0) return "N/A";
-        return (ms / 1000).toFixed(3) + "s";
-    };
-
-    // 3. Fungsi untuk mengisi tabel Round 1 (MENGGUNAKAN ANGKA)
-    const populateRound1 = (gradeNumber, elementId) => {
-        const table = document.getElementById(elementId);
-        if (!table) return; 
-
-        // String yang akan dicari: 'Kelas 10', 'Kelas 11', dst.
-        const searchString = `Kelas ${gradeNumber}`; 
-        
-        const gradeResults = r1Results
-            // FILTER KRUSIAL: Mencari string 'Kelas 10' atau 'Kelas 11' di awal nama tim
-            .filter(r => r['Team Name'] && r['Team Name'].startsWith(searchString)) 
-            .sort((a, b) => (a['Time (ms)'] || Infinity) - (b['Time (ms)'] || Infinity)); // Urutkan berdasarkan waktu
-        
-        if (gradeResults.length === 0) {
-            table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead>
-                                <tbody><tr><td colspan="2">Belum ada data.</td></tr></tbody>`;
-            return;
-        }
-
-        table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
-        const tbody = table.querySelector('tbody');
-        tbody.innerHTML = ''; 
-
-        gradeResults.forEach((team, index) => {
-            const isWinner = index === 0 && (team['Time (ms)'] > 0);
-            const winnerClass = isWinner ? 'class="race-winner"' : ''; 
-            tbody.innerHTML += `
-                <tr ${winnerClass}>
-                    <td>${team['Team Name']}</td>
-                    <td>${formatTime(team['Time (ms)'])}</td>
+            // Render Match Result
+            const matchRow = `
+                <tr>
+                    <td>${team1Name} vs ${team2Name}</td>
+                    <td>${score1} - ${score2}</td>
                 </tr>
             `;
-        });
+            matchTableBody.innerHTML += matchRow;
+        } else {
+            // Render match yang belum selesai
+            const matchRow = `
+                <tr>
+                    <td>${team1Name} vs ${team2Name}</td>
+                    <td>(Belum Dimainkan)</td>
+                </tr>
+            `;
+            matchTableBody.innerHTML += matchRow;
+        }
+    });
+
+    // 5. Hitung Goal Difference (GD)
+    Object.values(standings).forEach(team => {
+        team.GD = team.GF - team.GA;
+    });
+
+    // 6. Konversi ke array dan sortir (Ranking Criteria: Pts > GD > GF > H2H)
+    let rankedTeams = Object.values(standings);
+    
+    // Helper untuk H2H (digunakan jika Pts, GD, GF sama)
+    const getH2HResult = (teamA, teamB) => {
+        const match = matches.find(m => 
+            (m['Team 1'] === teamA.TeamName && m['Team 2'] === teamB.TeamName) ||
+            (m['Team 1'] === teamB.TeamName && m['Team 2'] === teamA.TeamName)
+        );
+        if (!match) return 0;
+
+        const scoreA = (match['Team 1'] === teamA.TeamName) ? parseInt(match['Score 1'] || 0) : parseInt(match['Score 2'] || 0);
+        const scoreB = (match['Team 1'] === teamA.TeamName) ? parseInt(match['Score 2'] || 0) : parseInt(match['Score 1'] || 0);
+
+        if (scoreA > scoreB) return 1; // Team A unggul H2H
+        if (scoreB > scoreA) return -1; // Team B unggul H2H
+        return 0; // Seri H2H
     };
 
-    // 4. Panggil fungsi untuk setiap angkatan (MENGGUNAKAN ANGKA)
-    populateRound1(10, 'race-round-X'); // Memanggil dengan angka 10
-    populateRound1(11, 'race-round-XI'); // Memanggil dengan angka 11
-    populateRound1(12, 'race-round-XII'); // Memanggil dengan angka 12
+    rankedTeams.sort((a, b) => {
+        // 1. Total Points (Pts)
+        if (b.Pts !== a.Pts) return b.Pts - a.Pts;
 
-    // 5. Fungsi untuk mengisi tabel Final (Round 2)
-    const tableFinal = document.getElementById('race-round-Final');
-    if (!tableFinal) return;
+        // 2. Goal Difference (GD)
+        if (b.GD !== a.GD) return b.GD - a.GD;
 
-    if (r2Results.length === 0) {
-        tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead>
-                                <tbody><tr><td colspan="3">Menunggu hasil kualifikasi.</td></tr></tbody>`;
-        return;
-    }
+        // 3. Goals For (GF)
+        if (b.GF !== a.GF) return b.GF - a.GF;
 
-    // Urutkan berdasarkan Rank (jika ada) atau Waktu
-    const finalResults = r2Results.sort((a, b) => (a['Rank'] || 99) - (b['Rank'] || 99));
+        // 4. Head-to-Head Result (H2H)
+        return getH2HResult(b, a);
+    });
 
-    tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
-    const tbodyFinal = tableFinal.querySelector('tbody');
-    tbodyFinal.innerHTML = ''; 
-    
-    finalResults.forEach(team => {
-        const rank = team['Rank'] || '-';
-        const rankClass = `rank-${rank}`; 
-        let rankIcon = rank;
+    // 7. Render Tabel Klasemen
+    rankedTeams.forEach((team, index) => {
+        const rank = index + 1;
+        let rankClass = '';
+        if (rank === 1) rankClass = 'rank-1-row';
+        else if (rank === 2) rankClass = 'rank-2-row';
+        else if (rank === 3) rankClass = 'rank-3-row';
 
-        if (rank === 1) rankIcon = '🥇';
-        if (rank === 2) rankIcon = '🥈';
-        if (rank === 3) rankIcon = '🥉';
+        const rankIcon = (rank === 1) ? '🥇' : (rank === 2) ? '🥈' : (rank === 3) ? '🥉' : rank;
 
-        tbodyFinal.innerHTML += `
+        const row = `
             <tr class="${rankClass}">
                 <td>${rankIcon}</td>
-                <td>${team['Team Name']}</td>
-                <td>${formatTime(team['Time (ms)'])}</td>
+                <td>${team.TeamName}</td>
+                <td>${team.P}</td>
+                <td>${team.W}</td>
+                <td>${team.D}</td>
+                <td>${team.L}</td>
+                <td>${team.GF}</td>
+                <td>${team.GA}</td>
+                <td>${team.GD > 0 ? '+' + team.GD : team.GD}</td>
+                <td>${team.Pts}</td>
             </tr>
         `;
+        tableBody.innerHTML += row;
     });
+
+    // Handle jika tidak ada tim yang dihitung
+    if (teams.length === 0) {
+        loader.style.display = 'block';
+        table.style.display = 'none';
+        matchTable.style.display = 'none';
+        loader.innerText = `Tidak ada tim yang dihitung dalam hasil Round Robin untuk ${sportName}.`;
+    }
 }
 
+
+// FUNGSI ASLI UNTUK BRACKET POHON (TIDAK BERUBAH)
+function renderBracketTree(sportName) {
+    const bracketMain = document.getElementById('bracket-main');
+    const loader = document.getElementById('bracket-loader');
+
+    const sportBrackets = allBracketsData.filter(match => match['Sport'] === sportName);
+    
+    if (sportBrackets.length === 0) {
+        bracketMain.style.display = 'none';
+        loader.style.display = 'block';
+        loader.innerText = `Belum ada data bracket untuk ${sportName}.`;
+        return;
+    }
+
+    loader.style.display = 'none';
+    bracketMain.style.display = 'flex';
+    
+    // Map data ke match
+    const matchMap = {};
+    sportBrackets.forEach(match => {
+        matchMap[match['Match Number']] = match;
+    });
+    
+    // Fungsi helper untuk membuat HTML tim
+    const createTeamHTML = (team, score, isWinner) => {
+        if (!team) return '<div class="bracket-team">&nbsp;</div>';
+        const winnerClass = isWinner ? 'winner' : '';
+        return `
+            <div class="bracket-team ${winnerClass}">
+                <span class="team-name">${team}</span>
+                <span class="team-score">${score !== null ? score : ''}</span>
+            </div>
+        `;
+    };
+    
+    // Fungsi helper untuk mengisi match
+    const fillMatch = (matchId, matchData) => {
+        const matchEl = document.getElementById(`match-${matchId}`);
+        if (!matchEl) return;
+
+        if (!matchData) {
+            matchEl.innerHTML = createTeamHTML(null) + createTeamHTML(null);
+            return;
+        }
+        
+        const winner = matchData['Winner'];
+        const team1 = matchData['Team 1'];
+        const team2 = matchData['Team 2'];
+        const score1 = matchData['Score 1'];
+        const score2 = matchData['Score 2'];
+
+        matchEl.innerHTML = `
+            ${createTeamHTML(team1, score1, winner === team1)}
+            ${createTeamHTML(team2, score2, winner === team2)}
+        `;
+    };
+
+    // Isi semua match
+    fillMatch(1, matchMap[1]);
+    fillMatch(2, matchMap[2]);
+    fillMatch(3, matchMap[3]);
+    fillMatch(4, matchMap[4]);
+    fillMatch(5, matchMap[5]); // Semi
+    fillMatch(6, matchMap[6]); // Semi
+    fillMatch(7, matchMap[7]); // 3rd Place
+    fillMatch(8, matchMap[8]); // Final
+    
+    // Isi Winner
+    const finalMatch = matchMap[8];
+    const winnerEl = document.getElementById('match-winner');
+    if (finalMatch && finalMatch['Winner']) {
+        winnerEl.innerHTML = createTeamHTML(finalMatch['Winner'], null, true);
+    } else {
+        winnerEl.innerHTML = createTeamHTML(null);
+    }
+}
+
+
+// FUNGSI ASLI UNTUK BRACKET BALAP (TIDAK BERUBAH)
+function renderRaceBracket(sportName) {
+    const loader = document.getElementById('bracket-loader');
+    
+    // 1. Filter data dari 'RaceResults'
+    const results = allRaceData.filter(r => r['Sport'] === sportName);
+    
+    if (results.length === 0) {
+        document.getElementById('bracket-race').style.display = 'none'; 
+        loader.style.display = 'block';
+        loader.innerText = `Belum ada data hasil balap untuk ${sportName}. Cek sheet "RaceResults".`;
+        return;
+    }
+
+    const r1Results = results.filter(r => r['Round'] == 1);
+    const r2Results = results.filter(r => r['Round'] == 2);
+
+    // 2. Helper untuk format waktu (ms ke detik)
+    const formatTime = (ms) => {
+        if (ms === null || isNaN(ms) || ms === 0) return "N/A";
+        return (ms / 1000).toFixed(3) + "s";
+    };
+
+    // 3. Fungsi untuk mengisi tabel Round 1 (MENGGUNAKAN ANGKA 10, 11, 12)
+    const populateRound1 = (gradeNumber, elementId) => {
+        const table = document.getElementById(elementId);
+        if (!table) return; 
+
+        // String yang akan dicari: 'Kelas 10', 'Kelas 11', dst.
+        const searchString = `Kelas ${gradeNumber}`; 
+        
+        const gradeResults = r1Results
+            // FILTER KRUSIAL: Mencari string 'Kelas 10' atau 'Kelas 11' di awal nama tim
+            .filter(r => r['Team Name'] && r['Team Name'].startsWith(searchString)) 
+            .sort((a, b) => (a['Time (ms)'] || Infinity) - (b['Time (ms)'] || Infinity)); // Urutkan berdasarkan waktu
+        
+        if (gradeResults.length === 0) {
+            table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead>
+                                <tbody><tr><td colspan="2">Belum ada data.</td></tr></tbody>`;
+            return;
+        }
+
+        table.innerHTML = `<thead><tr><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = ''; 
+
+        gradeResults.forEach((team, index) => {
+            const isWinner = index === 0 && (team['Time (ms)'] > 0);
+            const winnerClass = isWinner ? 'class="race-winner"' : ''; 
+            tbody.innerHTML += `
+                <tr ${winnerClass}>
+                    <td>${team['Team Name']}</td>
+                    <td>${formatTime(team['Time (ms)'])}</td>
+                </tr>
+            `;
+        });
+    };
+
+    // 4. Panggil fungsi untuk setiap angkatan (MENGGUNAKAN ANGKA)
+    populateRound1(10, 'race-round-X'); // Memanggil dengan angka 10
+    populateRound1(11, 'race-round-XI'); // Memanggil dengan angka 11
+    populateRound1(12, 'race-round-XII'); // Memanggil dengan angka 12
+
+    // 5. Fungsi untuk mengisi tabel Final (Round 2)
+    const tableFinal = document.getElementById('race-round-Final');
+    if (!tableFinal) return;
+
+    if (r2Results.length === 0) {
+        tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead>
+                                <tbody><tr><td colspan="3">Menunggu hasil kualifikasi.</td></tr></tbody>`;
+        return;
+    }
+
+    // Urutkan berdasarkan Rank (jika ada) atau Waktu
+    const finalResults = r2Results.sort((a, b) => (a['Rank'] || 99) - (b['Rank'] || 99));
+
+    tableFinal.innerHTML = `<thead><tr><th>Rank</th><th>Tim</th><th>Waktu</th></tr></thead><tbody></tbody>`;
+    const tbodyFinal = tableFinal.querySelector('tbody');
+    tbodyFinal.innerHTML = ''; 
+    
+    finalResults.forEach(team => {
+        const rank = team['Rank'] || '-';
+        const rankClass = `rank-${rank}`; 
+        let rankIcon = rank;
+
+        if (rank === 1) rankIcon = '🥇';
+        if (rank === 2) rankIcon = '🥈';
+        if (rank === 3) rankIcon = '🥉';
+
+        tbodyFinal.innerHTML += `
+            <tr class="${rankClass}">
+                <td>${rankIcon}</td>
+                <td>${team['Team Name']}</td>
+                <td>${formatTime(team['Time (ms)'])}</td>
+            </tr>
+        `;
+    });
+}
 
 // --- 3. SCHEDULE ---
 async function loadSchedule() {
