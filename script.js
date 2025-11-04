@@ -192,13 +192,19 @@ function renderBracketRouter(sportName) {
 }
 
 // FUNGSI BARU UNTUK BRACKET ROUND ROBIN (Klasemen)
-function renderRoundRobinBracket(sportName) {
+function renderRoundRobinBracket(sportName, sportInfo) {
     const container = document.getElementById('bracket-round-robin');
     const loader = document.getElementById('round-robin-loader');
     const tableBody = document.getElementById('round-robin-body');
     const matchTableBody = document.getElementById('round-robin-matches-body');
     const table = document.getElementById('round-robin-table');
     const matchTable = document.getElementById('round-robin-matches-table');
+
+    // Tentukan apakah ini sistem akumulasi skor murni (misalnya untuk total gol/poin)
+    // Asumsi: Kita menggunakan sistem akumulasi skor murni jika tipe bracket-nya 'Round-Robin'
+    // Untuk 'Sepak Bola' atau permainan berbasis W/D/L/Pts, kita tetap pakai sistem Poin (Pts) normal.
+    // Jika Anda ingin *selalu* menggunakan akumulasi skor untuk Round-Robin, hapus kondisi 'Sepak Bola'.
+    const isAccumulationMode = (sportName.toLowerCase() !== 'bola sepak'); // Tetapkan 'Sepak Bola' pakai Pts, selain itu pakai Akumulasi Skor
 
     // 1. Filter data pertandingan untuk olahraga ini
     const matches = allRoundRobinData.filter(m => m['Sport'] === sportName);
@@ -215,88 +221,152 @@ function renderRoundRobinBracket(sportName) {
     loader.style.display = 'none';
     table.style.display = 'table';
     matchTable.style.display = 'table';
+    
+    // Sesuaikan header tabel berdasarkan mode
+    if(isAccumulationMode) {
+        document.querySelector('#round-robin-table thead tr').innerHTML = `
+            <th>Rank</th>
+            <th>Team</th>
+            <th>P</th>
+            <th>Total Skor</th>
+        `;
+    } else {
+        document.querySelector('#round-robin-table thead tr').innerHTML = `
+            <th>Rank</th>
+            <th>Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+        `;
+    }
+
     tableBody.innerHTML = '';
     matchTableBody.innerHTML = '';
 
     // 2. Kumpulkan semua nama tim unik
     const teamsSet = new Set();
     matches.forEach(m => {
-        if (m['Team 1'] && m['Score 1'] !== null) teamsSet.add(m['Team 1']);
-        if (m['Team 2'] && m['Score 2'] !== null) teamsSet.add(m['Team 2']);
+        // Cek juga apakah ada skor yang valid, karena tim tanpa skor valid tidak perlu dihitung di klasemen
+        const score1 = parseInt(m['Score 1'] || 0);
+        const score2 = parseInt(m['Score 2'] || 0);
+        
+        if (m['Team 1'] && (!isNaN(score1) || m['Score 1'] === null)) teamsSet.add(m['Team 1']);
+        if (m['Team 2'] && (!isNaN(score2) || m['Score 2'] === null)) teamsSet.add(m['Team 2']);
     });
     const teams = Array.from(teamsSet);
 
     // 3. Inisialisasi statistik tim
     const standings = {};
     teams.forEach(team => {
-        standings[team] = { Pts: 0, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, GD: 0, TeamName: team, matches: [] };
+        standings[team] = { 
+            Pts: 0, 
+            P: 0, 
+            W: 0, 
+            D: 0, 
+            L: 0, 
+            GF: 0, 
+            GA: 0, 
+            GD: 0, 
+            TotalScore: 0, // VARIABEL BARU UNTUK AKUMULASI SKOR
+            TeamName: team, 
+            matches: [] 
+        };
     });
 
-    // 4. Hitung statistik dari setiap pertandingan
+    // 4. Hitung statistik dari setiap pertandingan & Render Match Result
+    const matchRowsHTML = [];
     matches.forEach(match => {
         const team1Name = match['Team 1'];
         const team2Name = match['Team 2'];
-        const score1 = parseInt(match['Score 1']);
-        const score2 = parseInt(match['Score 2']);
+        // Pastikan skor valid, gunakan 0 jika null atau kosong, tapi tetap cek isNaN
+        const score1 = parseInt(match['Score 1'] || 0);
+        const score2 = parseInt(match['Score 2'] || 0);
         
-        // Hanya proses jika skor valid (sudah dimainkan)
-        if (standings[team1Name] && standings[team2Name] && !isNaN(score1) && !isNaN(score2)) {
-            const team1 = standings[team1Name];
-            const team2 = standings[team2Name];
+        // Render Match Result
+        if (isNaN(score1) || isNaN(score2)) {
+             matchRowsHTML.push(`
+                <tr>
+                    <td>${team1Name} vs ${team2Name}</td>
+                    <td>(Skor Tidak Valid)</td>
+                </tr>
+            `);
+            return;
+        }
 
-            // Update P (Played) dan GF/GA
-            team1.P += 1;
-            team2.P += 1;
-            team1.GF += score1;
-            team1.GA += score2;
-            team2.GF += score2;
-            team2.GA += score1;
-
-            // Update W, D, L, Pts
-            if (score1 > score2) { // Team 1 Win
-                team1.W += 1;
-                team1.Pts += 3;
-                team2.L += 1;
-            } else if (score2 > score1) { // Team 2 Win
-                team2.W += 1;
-                team2.Pts += 3;
-                team1.L += 1;
-            } else { // Draw
-                team1.D += 1;
-                team1.Pts += 1;
-                team2.D += 1;
-                team2.Pts += 1;
-            }
-
-            // Render Match Result
-            const matchRow = `
+        if (match['Score 1'] !== null && match['Score 2'] !== null) { // Sudah dimainkan
+             matchRowsHTML.push(`
                 <tr>
                     <td>${team1Name} vs ${team2Name}</td>
                     <td>${score1} - ${score2}</td>
                 </tr>
-            `;
-            matchTableBody.innerHTML += matchRow;
-        } else {
-            // Render match yang belum selesai
-            const matchRow = `
+            `);
+        } else { // Belum selesai
+            matchRowsHTML.push(`
                 <tr>
                     <td>${team1Name} vs ${team2Name}</td>
                     <td>(Belum Dimainkan)</td>
                 </tr>
-            `;
-            matchTableBody.innerHTML += matchRow;
+            `);
+            return; // Jangan hitung statistik jika belum dimainkan
+        }
+        
+        // HANYA PROSES STATISTIK JIKA SKOR VALID DAN SUDAH DIMASUKKAN
+        if (standings[team1Name] && standings[team2Name] && !isNaN(score1) && !isNaN(score2)) {
+            const team1 = standings[team1Name];
+            const team2 = standings[team2Name];
+
+            // Selalu Update P (Played)
+            team1.P += 1;
+            team2.P += 1;
+            
+            if (isAccumulationMode) {
+                // LOGIKA AKUMULASI SKOR MURNI
+                // Dalam mode ini, yang dihitung hanya TotalScore dari semua skor yang didapat (score1 untuk team1, score2 untuk team2)
+                team1.TotalScore += score1; 
+                team2.TotalScore += score2;
+
+            } else {
+                // LOGIKA POIN (W/D/L/GF/GA) STANDAR (Untuk Sepak Bola, dll)
+                team1.GF += score1;
+                team1.GA += score2;
+                team2.GF += score2;
+                team2.GA += score1;
+
+                if (score1 > score2) { // Team 1 Win
+                    team1.W += 1;
+                    team1.Pts += 3;
+                    team2.L += 1;
+                } else if (score2 > score1) { // Team 2 Win
+                    team2.W += 1;
+                    team2.Pts += 3;
+                    team1.L += 1;
+                } else { // Draw
+                    team1.D += 1;
+                    team1.Pts += 1;
+                    team2.D += 1;
+                    team2.Pts += 1;
+                }
+            }
         }
     });
+    matchTableBody.innerHTML = matchRowsHTML.join(''); // Set hasil pertandingan
 
-    // 5. Hitung Goal Difference (GD)
-    Object.values(standings).forEach(team => {
-        team.GD = team.GF - team.GA;
-    });
+    // 5. Hitung Goal Difference (GD) hanya jika tidak dalam mode akumulasi
+    if (!isAccumulationMode) {
+        Object.values(standings).forEach(team => {
+            team.GD = team.GF - team.GA;
+        });
+    }
 
-    // 6. Konversi ke array dan sortir (Ranking Criteria: Pts > GD > GF > H2H)
+    // 6. Konversi ke array dan sortir
     let rankedTeams = Object.values(standings);
     
-    // Helper untuk H2H (digunakan jika Pts, GD, GF sama)
+    // Helper untuk H2H (digunakan jika Pts, GD, GF sama) - HANYA UNTUK MODE POIN
     const getH2HResult = (teamA, teamB) => {
         const match = matches.find(m => 
             (m['Team 1'] === teamA.TeamName && m['Team 2'] === teamB.TeamName) ||
@@ -313,21 +383,26 @@ function renderRoundRobinBracket(sportName) {
     };
 
     rankedTeams.sort((a, b) => {
-        // 1. Total Points (Pts)
-        if (b.Pts !== a.Pts) return b.Pts - a.Pts;
-
-        // 2. Goal Difference (GD)
-        if (b.GD !== a.GD) return b.GD - a.GD;
-
-        // 3. Goals For (GF)
-        if (b.GF !== a.GF) return b.GF - a.GF;
-
-        // 4. Head-to-Head Result (H2H)
-        return getH2HResult(b, a);
+        if (isAccumulationMode) {
+            // Ranking Criteria: Total Score > Team Name (alfabetis)
+            if (b.TotalScore !== a.TotalScore) return b.TotalScore - a.TotalScore;
+            return a.TeamName.localeCompare(b.TeamName); // Tie-breaker: Nama Tim
+            
+        } else {
+            // Ranking Criteria: Pts > GD > GF > H2H (Mode Poin Standar)
+            // 1. Total Points (Pts)
+            if (b.Pts !== a.Pts) return b.Pts - a.Pts;
+            // 2. Goal Difference (GD)
+            if (b.GD !== a.GD) return b.GD - a.GD;
+            // 3. Goals For (GF)
+            if (b.GF !== a.GF) return b.GF - a.GF;
+            // 4. Head-to-Head Result (H2H)
+            return getH2HResult(b, a);
+        }
     });
 
     // 7. Render Tabel Klasemen
-    rankedTeams.forEach((team, index) => {
+    const standingsRowsHTML = rankedTeams.map((team, index) => {
         const rank = index + 1;
         let rankClass = '';
         if (rank === 1) rankClass = 'rank-1-row';
@@ -336,22 +411,34 @@ function renderRoundRobinBracket(sportName) {
 
         const rankIcon = (rank === 1) ? '🥇' : (rank === 2) ? '🥈' : (rank === 3) ? '🥉' : rank;
 
-        const row = `
-            <tr class="${rankClass}">
-                <td>${rankIcon}</td>
-                <td>${team.TeamName}</td>
-                <td>${team.P}</td>
-                <td>${team.W}</td>
-                <td>${team.D}</td>
-                <td>${team.L}</td>
-                <td>${team.GF}</td>
-                <td>${team.GA}</td>
-                <td>${team.GD > 0 ? '+' + team.GD : team.GD}</td>
-                <td>${team.Pts}</td>
-            </tr>
-        `;
-        tableBody.innerHTML += row;
-    });
+        if (isAccumulationMode) {
+             return `
+                <tr class="${rankClass}">
+                    <td>${rankIcon}</td>
+                    <td>${team.TeamName}</td>
+                    <td>${team.P}</td>
+                    <td>${team.TotalScore}</td>
+                </tr>
+            `;
+        } else {
+             return `
+                <tr class="${rankClass}">
+                    <td>${rankIcon}</td>
+                    <td>${team.TeamName}</td>
+                    <td>${team.P}</td>
+                    <td>${team.W}</td>
+                    <td>${team.D}</td>
+                    <td>${team.L}</td>
+                    <td>${team.GF}</td>
+                    <td>${team.GA}</td>
+                    <td>${team.GD > 0 ? '+' + team.GD : team.GD}</td>
+                    <td>${team.Pts}</td>
+                </tr>
+            `;
+        }
+    }).join('');
+
+    tableBody.innerHTML = standingsRowsHTML; // Set klasemen
 
     // Handle jika tidak ada tim yang dihitung
     if (teams.length === 0) {
