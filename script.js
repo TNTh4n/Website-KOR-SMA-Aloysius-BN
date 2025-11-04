@@ -234,7 +234,7 @@ function renderRoundRobinBracket(sportName, sportInfo) {
         document.querySelector('#round-robin-table thead tr').innerHTML = `
             <th>Rank</th>
             <th>Team</th>
-            <th>P</th>
+            <th>Played</th>
             <th>W</th>
             <th>D</th>
             <th>L</th>
